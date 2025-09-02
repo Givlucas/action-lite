@@ -3,7 +3,7 @@ use clap::{Parser, Subcommand};
 use colored::*;
 use std::path::PathBuf;
 
-use action_lite::{Workspace, Action, Status};
+use action_lite::{Workspace, Status};
 
 #[derive(Parser)]
 #[command(name = "action")]
@@ -101,7 +101,7 @@ fn main() -> Result<()> {
     match cli.command {
         Commands::Init { path } => {
             let init_path = path.unwrap_or(workspace_path);
-            let workspace = Workspace::init(&init_path)?;
+            let _workspace = Workspace::init(&init_path)?;
             println!("{} Action Lite workspace initialized at: {}", 
                 "✓".green(), 
                 init_path.display().to_string().cyan()
@@ -110,8 +110,8 @@ fn main() -> Result<()> {
         }
         
         Commands::New { project, title, priority } => {
-            let workspace = Workspace::load(&workspace_path)?;
-            let action = workspace.create_action(&project, &title, priority)?;
+            let mut workspace = Workspace::load(&workspace_path)?;
+            let _action = workspace.create_action(&project, &title, priority)?;
             println!("{} Created action: {} in project {}", 
                 "✓".green(), 
                 title.cyan(), 
@@ -149,7 +149,7 @@ fn main() -> Result<()> {
                     action.status().to_string().color(status_color),
                     action.project().yellow(),
                     action.title().cyan(),
-                    action.statement_of_action().unwrap_or("No description").dimmed()
+                    action.statement_of_action().map_or("No description", |s| s.as_str()).dimmed()
                 );
             }
             Ok(())
@@ -189,7 +189,7 @@ fn main() -> Result<()> {
         }
         
         Commands::Status { project, title, status } => {
-            let workspace = Workspace::load(&workspace_path)?;
+            let mut workspace = Workspace::load(&workspace_path)?;
             let new_status = Status::from_str(&status)?;
             workspace.update_action_status(&project, &title, new_status)?;
             println!("{} Updated status of {}/{} to {}", 
@@ -202,7 +202,7 @@ fn main() -> Result<()> {
         }
         
         Commands::Priority { project, title, set } => {
-            let workspace = Workspace::load(&workspace_path)?;
+            let mut workspace = Workspace::load(&workspace_path)?;
             workspace.set_action_priority(&project, &title, set)?;
             let action_desc = format!("{}/{}", project.yellow(), title.cyan());
             if set {
@@ -221,7 +221,7 @@ fn main() -> Result<()> {
         
         Commands::MetaGraph { project, title } => {
             let workspace = Workspace::load(&workspace_path)?;
-            workspace.create_meta_graph(&project, &title)?;
+            let _meta_graph_path = workspace.create_meta_graph(&project, &title)?;
             println!("{} Created meta-graph directory for {}/{}", 
                 "✓".green(), 
                 project.yellow(), 
