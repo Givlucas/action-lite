@@ -1,0 +1,25 @@
+[package]
+name = "action-lite"
+version = "0.1.0"
+edition = "2021"
+description = "A file-based task tracking system implementing the Action Lite methodology"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT OR Apache-2.0"
+
+[[bin]]
+name = "action"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+chrono = { version = "0.4", features = ["serde"] }
+walkdir = "2.4"
+regex = "1.10"
+anyhow = "1.0"
+thiserror = "1.0"
+colored = "2.0"
+dialoguer = "0.11"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+comrak = "0.19"
