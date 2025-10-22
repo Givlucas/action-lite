@@ -140,6 +140,11 @@ Create a new action with a template:
 action-lite new "implement-feature" --project my-project
 ```
 
+Notes:
+- Action names cannot contain path separators (`/` or `\`)
+- Project names must contain only letters, numbers, hyphens, and underscores
+- Use the `move` command to organize actions into subdirectories after creation
+
 ### Graph Actions
 
 Display a visual dependency graph in the terminal:
@@ -166,7 +171,7 @@ action-lite move action.md subdir/action.md
 This will:
 - Move the action file
 - Move any associated meta-graph directory
-- Update all references in other actions
+- Update all markdown link references in other actions (smart replacement within `[text](path)` syntax only)
 
 ### Specify Action Directory
 

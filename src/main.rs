@@ -9,9 +9,17 @@ use walkdir::WalkDir;
 
 #[derive(Parser)]
 #[command(name = "action-lite")]
-#[command(about = "A file-based task tracking system using acyclic directed meta graphs", long_about = None)]
+#[command(version = "0.1.0")]
+#[command(about = "A file-based task tracking system using acyclic directed meta graphs")]
+#[command(long_about = "Action Lite helps you manage tasks and their dependencies using markdown files.\n\
+                         Each action is tracked through states: discovery, design, implementation, test, document, publish, published.\n\
+                         \n\
+                         Example usage:\n  \
+                         action-lite list\n  \
+                         action-lite graph\n  \
+                         action-lite priority")]
 struct Cli {
-    #[arg(short, long, default_value = ".")]
+    #[arg(short, long, default_value = ".", help = "Path to the actions directory")]
     path: PathBuf,
 
     #[command(subcommand)]
@@ -75,9 +83,9 @@ impl Action {
             .unwrap_or("unknown")
             .to_string();
 
-        // Extract tags
-        let tag_regex = Regex::new(r"#(\w+)").unwrap();
-        let mut tags: Vec<String> = tag_regex
+        // Extract tags (including hyphens in tag names)
+        let tag_regex = Regex::new(r"#([\w-]+)").unwrap();
+        let tags: Vec<String> = tag_regex
             .captures_iter(&content)
             .map(|cap| cap[1].to_string())
             .collect();
@@ -208,6 +216,9 @@ fn find_actions(base_path: &Path) -> Result<Vec<Action>> {
         }
     }
 
+    // Sort actions by name for consistent output
+    actions.sort_by(|a, b| a.name.cmp(&b.name));
+
     Ok(actions)
 }
 
@@ -255,6 +266,16 @@ fn list_priority(base_path: &Path) -> Result<()> {
 }
 
 fn list_by_status(base_path: &Path, status: &str) -> Result<()> {
+    // Validate status
+    let valid_states = ["discovery", "design", "implementation", "test", "document", "publish", "published"];
+    if !valid_states.contains(&status) {
+        anyhow::bail!(
+            "Invalid status '{}'. Valid statuses are: {}",
+            status,
+            valid_states.join(", ")
+        );
+    }
+
     let actions = find_actions(base_path)?;
     let filtered_actions: Vec<_> = actions.iter().filter(|a| a.status == status).collect();
 
@@ -277,11 +298,30 @@ fn list_by_status(base_path: &Path, status: &str) -> Result<()> {
 }
 
 fn create_action(base_path: &Path, name: &str, project: &str) -> Result<()> {
+    // Validate action name (no path separators)
+    if name.contains('/') || name.contains('\\') {
+        anyhow::bail!("Action name cannot contain path separators. Use 'move' command to organize actions in subdirectories.");
+    }
+
+    if name.is_empty() {
+        anyhow::bail!("Action name cannot be empty");
+    }
+
+    // Validate project name (must be a valid tag - alphanumeric, hyphens, underscores)
+    if project.is_empty() {
+        anyhow::bail!("Project name cannot be empty");
+    }
+
+    let valid_project_regex = Regex::new(r"^[a-zA-Z0-9_-]+$").unwrap();
+    if !valid_project_regex.is_match(project) {
+        anyhow::bail!("Project name must contain only letters, numbers, hyphens, and underscores");
+    }
+
     let file_name = format!("{}.md", name);
     let file_path = base_path.join(&file_name);
 
     if file_path.exists() {
-        anyhow::bail!("Action '{}' already exists", name);
+        anyhow::bail!("Action '{}' already exists at {}", name, file_path.display());
     }
 
     let template = format!(
@@ -478,16 +518,27 @@ fn move_action(base_path: &Path, from: &str, to: &str) -> Result<()> {
     let actions = find_actions(base_path)?;
     let mut updated_count = 0;
 
+    // Create regex to match markdown links with the old path
+    // This ensures we only replace within markdown link syntax
+    let link_pattern = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from));
+    let link_regex = Regex::new(&link_pattern)
+        .context("Failed to create replacement regex")?;
+
     for action in actions {
         let content = fs::read_to_string(&action.path)?;
-        let old_ref = from;
-        let new_ref = to;
 
-        if content.contains(old_ref) {
-            let new_content = content.replace(old_ref, new_ref);
-            fs::write(&action.path, new_content)?;
-            updated_count += 1;
-            println!("{}", format!("Updated references in: {}", action.path.display()).cyan());
+        // Check if there are any matches
+        if link_regex.is_match(&content) {
+            // Replace only the path part within markdown links
+            let new_content = link_regex.replace_all(&content, |caps: &regex::Captures| {
+                format!("[{}]({})", &caps[1], to)
+            });
+
+            if new_content != content {
+                fs::write(&action.path, new_content.as_ref())?;
+                updated_count += 1;
+                println!("{}", format!("Updated references in: {}", action.path.display()).cyan());
+            }
         }
     }
 
@@ -502,6 +553,16 @@ fn move_action(base_path: &Path, from: &str, to: &str) -> Result<()> {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
+
+    // Check if path exists
+    if !cli.path.exists() {
+        anyhow::bail!("Path '{}' does not exist", cli.path.display());
+    }
+
+    if !cli.path.is_dir() {
+        anyhow::bail!("Path '{}' is not a directory", cli.path.display());
+    }
+
     let base_path = cli.path.canonicalize()
         .context("Failed to resolve path")?;
 
