@@ -1,0 +1,518 @@
+use anyhow::{Context, Result};
+use clap::{Parser, Subcommand};
+use colored::*;
+use regex::Regex;
+use std::collections::{HashMap, HashSet};
+use std::fs;
+use std::path::{Path, PathBuf};
+use walkdir::WalkDir;
+
+#[derive(Parser)]
+#[command(name = "action-lite")]
+#[command(about = "A file-based task tracking system using acyclic directed meta graphs", long_about = None)]
+struct Cli {
+    #[arg(short, long, default_value = ".")]
+    path: PathBuf,
+
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    #[command(about = "List all actions and their status")]
+    List,
+
+    #[command(about = "List priority actions")]
+    Priority,
+
+    #[command(about = "List actions by status")]
+    Status {
+        #[arg(help = "Status to filter by: discovery, design, implementation, test, document, publish, published")]
+        status: String,
+    },
+
+    #[command(about = "Create a new empty action")]
+    New {
+        #[arg(help = "Name of the new action")]
+        name: String,
+
+        #[arg(short, long, help = "Project name")]
+        project: String,
+    },
+
+    #[command(about = "Graph the actions in terminal")]
+    Graph,
+
+    #[command(about = "Move an action and update all references")]
+    Move {
+        #[arg(help = "Source path (relative to action directory)")]
+        from: String,
+
+        #[arg(help = "Destination path (relative to action directory)")]
+        to: String,
+    },
+}
+
+#[derive(Debug, Clone)]
+struct Action {
+    path: PathBuf,
+    name: String,
+    status: String,
+    project: String,
+    is_priority: bool,
+    inputs: Vec<String>,
+}
+
+impl Action {
+    fn from_file(path: &Path, base_path: &Path) -> Result<Self> {
+        let content = fs::read_to_string(path)
+            .context(format!("Failed to read file: {}", path.display()))?;
+
+        let name = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+
+        // Extract tags
+        let tag_regex = Regex::new(r"#(\w+)").unwrap();
+        let mut tags: Vec<String> = tag_regex
+            .captures_iter(&content)
+            .map(|cap| cap[1].to_string())
+            .collect();
+
+        // Determine status (looking for state tags)
+        let valid_states = ["discovery", "design", "implementation", "test", "document", "publish", "published"];
+        let status = tags
+            .iter()
+            .find(|t| valid_states.contains(&t.as_str()))
+            .cloned()
+            .unwrap_or_else(|| "discovery".to_string());
+
+        // Check for priority
+        let is_priority = tags.contains(&"priority".to_string());
+
+        // Find project tag (anything that's not action, priority, or a status)
+        let project = tags
+            .iter()
+            .find(|t| {
+                t.as_str() != "action"
+                    && t.as_str() != "priority"
+                    && !valid_states.contains(&t.as_str())
+            })
+            .cloned()
+            .unwrap_or_else(|| "default".to_string());
+
+        // Extract inputs from Statement of Inputs section
+        let inputs = Self::extract_inputs(&content, base_path);
+
+        Ok(Action {
+            path: path.to_path_buf(),
+            name,
+            status,
+            project,
+            is_priority,
+            inputs,
+        })
+    }
+
+    fn extract_inputs(content: &str, base_path: &Path) -> Vec<String> {
+        let mut inputs = Vec::new();
+
+        // Look for Statement of Inputs section
+        let section_regex = Regex::new(r"(?m)^# Statement of Inputs\s*$").unwrap();
+        let link_regex = Regex::new(r"\[([^\]]+)\]\(([^\)]+\.md)\)").unwrap();
+
+        if let Some(section_match) = section_regex.find(content) {
+            let section_start = section_match.end();
+
+            // Find the next section or end of file
+            let next_section_regex = Regex::new(r"(?m)^# ").unwrap();
+            let section_end = next_section_regex
+                .find_at(content, section_start + 1)
+                .map(|m| m.start())
+                .unwrap_or(content.len());
+
+            let section_content = &content[section_start..section_end];
+
+            // Extract all markdown links
+            for cap in link_regex.captures_iter(section_content) {
+                if let Some(link) = cap.get(2) {
+                    inputs.push(link.as_str().to_string());
+                }
+            }
+        }
+
+        inputs
+    }
+
+    fn display(&self, show_path: bool) {
+        let status_colored = match self.status.as_str() {
+            "discovery" => self.status.blue(),
+            "design" => self.status.cyan(),
+            "implementation" => self.status.yellow(),
+            "test" => self.status.magenta(),
+            "document" => self.status.green(),
+            "publish" => self.status.bright_green(),
+            "published" => self.status.bright_blue(),
+            _ => self.status.white(),
+        };
+
+        let priority_marker = if self.is_priority {
+            " [PRIORITY]".red().bold()
+        } else {
+            "".normal()
+        };
+
+        let project_colored = format!("[{}]", self.project).bright_black();
+
+        if show_path {
+            println!(
+                "{} {} {}{}",
+                status_colored.bold(),
+                self.name.bright_white().bold(),
+                project_colored,
+                priority_marker
+            );
+            println!("  {}", self.path.display().to_string().bright_black());
+        } else {
+            println!(
+                "{} {} {}{}",
+                status_colored.bold(),
+                self.name.bright_white().bold(),
+                project_colored,
+                priority_marker
+            );
+        }
+    }
+}
+
+fn find_actions(base_path: &Path) -> Result<Vec<Action>> {
+    let mut actions = Vec::new();
+
+    for entry in WalkDir::new(base_path)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        let path = entry.path();
+        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("md") {
+            // Check if file contains #action tag
+            if let Ok(content) = fs::read_to_string(path) {
+                if content.contains("#action") {
+                    if let Ok(action) = Action::from_file(path, base_path) {
+                        actions.push(action);
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(actions)
+}
+
+fn list_actions(base_path: &Path) -> Result<()> {
+    let actions = find_actions(base_path)?;
+
+    if actions.is_empty() {
+        println!("{}", "No actions found.".yellow());
+        return Ok(());
+    }
+
+    println!("{}", "Actions:".bright_white().bold().underline());
+    println!();
+
+    for action in &actions {
+        action.display(true);
+        println!();
+    }
+
+    println!("{}", format!("Total: {} actions", actions.len()).bright_black());
+
+    Ok(())
+}
+
+fn list_priority(base_path: &Path) -> Result<()> {
+    let actions = find_actions(base_path)?;
+    let priority_actions: Vec<_> = actions.iter().filter(|a| a.is_priority).collect();
+
+    if priority_actions.is_empty() {
+        println!("{}", "No priority actions found.".yellow());
+        return Ok(());
+    }
+
+    println!("{}", "Priority Actions:".red().bold().underline());
+    println!();
+
+    for action in &priority_actions {
+        action.display(true);
+        println!();
+    }
+
+    println!("{}", format!("Total: {} priority actions", priority_actions.len()).bright_black());
+
+    Ok(())
+}
+
+fn list_by_status(base_path: &Path, status: &str) -> Result<()> {
+    let actions = find_actions(base_path)?;
+    let filtered_actions: Vec<_> = actions.iter().filter(|a| a.status == status).collect();
+
+    if filtered_actions.is_empty() {
+        println!("{}", format!("No actions found with status '{}'.", status).yellow());
+        return Ok(());
+    }
+
+    println!("{}", format!("Actions with status '{}':", status).bright_white().bold().underline());
+    println!();
+
+    for action in &filtered_actions {
+        action.display(true);
+        println!();
+    }
+
+    println!("{}", format!("Total: {} actions", filtered_actions.len()).bright_black());
+
+    Ok(())
+}
+
+fn create_action(base_path: &Path, name: &str, project: &str) -> Result<()> {
+    let file_name = format!("{}.md", name);
+    let file_path = base_path.join(&file_name);
+
+    if file_path.exists() {
+        anyhow::bail!("Action '{}' already exists", name);
+    }
+
+    let template = format!(
+        r#"# {}
+
+#action #discovery #{}
+
+# Notes
+
+# Statement of Action
+
+# Statement of Inputs
+
+# Statement of Design
+
+## Output
+
+### Design
+
+# Analysis of Impact
+"#,
+        name, project
+    );
+
+    fs::write(&file_path, template)
+        .context(format!("Failed to create action file: {}", file_path.display()))?;
+
+    println!("{}", format!("Created action: {}", file_path.display()).green());
+
+    Ok(())
+}
+
+fn graph_actions(base_path: &Path) -> Result<()> {
+    let actions = find_actions(base_path)?;
+
+    if actions.is_empty() {
+        println!("{}", "No actions found.".yellow());
+        return Ok(());
+    }
+
+    println!("{}", "Action Dependency Graph:".bright_white().bold().underline());
+    println!();
+
+    // Build a map of action names to actions
+    let mut action_map: HashMap<String, &Action> = HashMap::new();
+    for action in &actions {
+        action_map.insert(action.name.clone(), action);
+    }
+
+    // Track which actions we've already displayed
+    let mut displayed = HashSet::new();
+
+    // Find root actions (those with no inputs or whose inputs are not in the action set)
+    let mut roots = Vec::new();
+    for action in &actions {
+        let has_internal_inputs = action.inputs.iter().any(|input| {
+            let input_name = Path::new(input)
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("");
+            action_map.contains_key(input_name)
+        });
+
+        if !has_internal_inputs {
+            roots.push(action);
+        }
+    }
+
+    // Display root actions first
+    for root in &roots {
+        display_action_tree(root, &action_map, &mut displayed, 0);
+    }
+
+    // Display any remaining actions that weren't reached from roots
+    for action in &actions {
+        if !displayed.contains(&action.name) {
+            display_action_tree(action, &action_map, &mut displayed, 0);
+        }
+    }
+
+    Ok(())
+}
+
+fn display_action_tree(
+    action: &Action,
+    action_map: &HashMap<String, &Action>,
+    displayed: &mut HashSet<String>,
+    depth: usize,
+) {
+    if displayed.contains(&action.name) {
+        // Show reference to already displayed action
+        let indent = "  ".repeat(depth);
+        println!(
+            "{}{}  {} {} (see above)",
+            indent,
+            "→".cyan(),
+            action.name.bright_white(),
+            format!("[{}]", action.status).bright_black()
+        );
+        return;
+    }
+
+    displayed.insert(action.name.clone());
+
+    let indent = "  ".repeat(depth);
+    let connector = if depth == 0 { "●" } else { "→" };
+
+    let status_colored = match action.status.as_str() {
+        "discovery" => action.status.blue(),
+        "design" => action.status.cyan(),
+        "implementation" => action.status.yellow(),
+        "test" => action.status.magenta(),
+        "document" => action.status.green(),
+        "publish" => action.status.bright_green(),
+        "published" => action.status.bright_blue(),
+        _ => action.status.white(),
+    };
+
+    let priority_marker = if action.is_priority {
+        " [PRIORITY]".red()
+    } else {
+        "".normal()
+    };
+
+    println!(
+        "{}{}  {} {} {}{}",
+        indent,
+        connector.cyan(),
+        action.name.bright_white().bold(),
+        format!("[{}]", status_colored).bright_black(),
+        format!("[{}]", action.project).bright_black(),
+        priority_marker
+    );
+
+    // Display dependencies
+    for input in &action.inputs {
+        let input_name = Path::new(input)
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("");
+
+        if let Some(&dep_action) = action_map.get(input_name) {
+            display_action_tree(dep_action, action_map, displayed, depth + 1);
+        } else {
+            // External dependency
+            let dep_indent = "  ".repeat(depth + 1);
+            println!(
+                "{}{}  {} {}",
+                dep_indent,
+                "→".bright_black(),
+                input_name.bright_black(),
+                "[external]".bright_black()
+            );
+        }
+    }
+}
+
+fn move_action(base_path: &Path, from: &str, to: &str) -> Result<()> {
+    let from_path = base_path.join(from);
+    let to_path = base_path.join(to);
+
+    if !from_path.exists() {
+        anyhow::bail!("Source action '{}' does not exist", from_path.display());
+    }
+
+    if to_path.exists() {
+        anyhow::bail!("Destination '{}' already exists", to_path.display());
+    }
+
+    // Create parent directory if it doesn't exist
+    if let Some(parent) = to_path.parent() {
+        fs::create_dir_all(parent)
+            .context("Failed to create destination directory")?;
+    }
+
+    // Move the file
+    fs::rename(&from_path, &to_path)
+        .context("Failed to move action file")?;
+
+    println!("{}", format!("Moved: {} -> {}", from, to).green());
+
+    // Check if there's a directory with the same name (for meta-graph)
+    let from_dir = from_path.with_extension("");
+    let to_dir = to_path.with_extension("");
+
+    if from_dir.exists() && from_dir.is_dir() {
+        fs::rename(&from_dir, &to_dir)
+            .context("Failed to move meta-graph directory")?;
+        println!("{}", format!("Moved meta-graph directory: {} -> {}",
+            from_dir.display(), to_dir.display()).green());
+    }
+
+    // Update all references in other actions
+    let actions = find_actions(base_path)?;
+    let mut updated_count = 0;
+
+    for action in actions {
+        let content = fs::read_to_string(&action.path)?;
+        let old_ref = from;
+        let new_ref = to;
+
+        if content.contains(old_ref) {
+            let new_content = content.replace(old_ref, new_ref);
+            fs::write(&action.path, new_content)?;
+            updated_count += 1;
+            println!("{}", format!("Updated references in: {}", action.path.display()).cyan());
+        }
+    }
+
+    if updated_count > 0 {
+        println!("{}", format!("Updated {} action(s)", updated_count).bright_green());
+    } else {
+        println!("{}", "No references to update".bright_black());
+    }
+
+    Ok(())
+}
+
+fn main() -> Result<()> {
+    let cli = Cli::parse();
+    let base_path = cli.path.canonicalize()
+        .context("Failed to resolve path")?;
+
+    match cli.command {
+        Commands::List => list_actions(&base_path)?,
+        Commands::Priority => list_priority(&base_path)?,
+        Commands::Status { status } => list_by_status(&base_path, &status)?,
+        Commands::New { name, project } => create_action(&base_path, &name, &project)?,
+        Commands::Graph => graph_actions(&base_path)?,
+        Commands::Move { from, to } => move_action(&base_path, &from, &to)?,
+    }
+
+    Ok(())
+}
