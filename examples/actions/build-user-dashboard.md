@@ -12,7 +12,7 @@ Build a user dashboard that displays key metrics and allows users to manage thei
 
 # Statement of Inputs
 
-- [Implement Authentication](implement-authentication.md)
+- [Implement Authentication](implement-authentication)
 
 # Statement of Design
 

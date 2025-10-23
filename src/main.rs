@@ -130,7 +130,8 @@ impl Action {
 
         // Look for Statement of Inputs section
         let section_regex = Regex::new(r"(?m)^# Statement of Inputs\s*$").unwrap();
-        let link_regex = Regex::new(r"\[([^\]]+)\]\(([^\)]+\.md)\)").unwrap();
+        // Match markdown links with or without .md extension
+        let link_regex = Regex::new(r"\[([^\]]+)\]\(([^\)]+)\)").unwrap();
 
         if let Some(section_match) = section_regex.find(content) {
             let section_start = section_match.end();
@@ -147,7 +148,14 @@ impl Action {
             // Extract all markdown links
             for cap in link_regex.captures_iter(section_content) {
                 if let Some(link) = cap.get(2) {
-                    inputs.push(link.as_str().to_string());
+                    let link_str = link.as_str();
+                    // Normalize: ensure .md extension is present
+                    let normalized = if link_str.ends_with(".md") {
+                        link_str.to_string()
+                    } else {
+                        format!("{}.md", link_str)
+                    };
+                    inputs.push(normalized);
                 }
             }
         }
@@ -518,27 +526,46 @@ fn move_action(base_path: &Path, from: &str, to: &str) -> Result<()> {
     let actions = find_actions(base_path)?;
     let mut updated_count = 0;
 
-    // Create regex to match markdown links with the old path
-    // This ensures we only replace within markdown link syntax
-    let link_pattern = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from));
-    let link_regex = Regex::new(&link_pattern)
+    // Create regex patterns to match markdown links with the old path
+    // Match both with and without .md extension
+    let from_without_ext = from.strip_suffix(".md").unwrap_or(from);
+    let to_without_ext = to.strip_suffix(".md").unwrap_or(to);
+
+    // Pattern 1: Match links with .md extension
+    let link_pattern_with_ext = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from));
+    let link_regex_with_ext = Regex::new(&link_pattern_with_ext)
+        .context("Failed to create replacement regex")?;
+
+    // Pattern 2: Match links without .md extension (if from has .md)
+    let link_pattern_without_ext = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from_without_ext));
+    let link_regex_without_ext = Regex::new(&link_pattern_without_ext)
         .context("Failed to create replacement regex")?;
 
     for action in actions {
         let content = fs::read_to_string(&action.path)?;
+        let mut new_content = content.clone();
+        let mut modified = false;
 
-        // Check if there are any matches
-        if link_regex.is_match(&content) {
-            // Replace only the path part within markdown links
-            let new_content = link_regex.replace_all(&content, |caps: &regex::Captures| {
+        // Replace links with .md extension
+        if link_regex_with_ext.is_match(&new_content) {
+            new_content = link_regex_with_ext.replace_all(&new_content, |caps: &regex::Captures| {
                 format!("[{}]({})", &caps[1], to)
-            });
+            }).to_string();
+            modified = true;
+        }
 
-            if new_content != content {
-                fs::write(&action.path, new_content.as_ref())?;
-                updated_count += 1;
-                println!("{}", format!("Updated references in: {}", action.path.display()).cyan());
-            }
+        // Replace links without .md extension (only if different from the with-ext pattern)
+        if from != from_without_ext && link_regex_without_ext.is_match(&new_content) {
+            new_content = link_regex_without_ext.replace_all(&new_content, |caps: &regex::Captures| {
+                format!("[{}]({})", &caps[1], to_without_ext)
+            }).to_string();
+            modified = true;
+        }
+
+        if modified && new_content != content {
+            fs::write(&action.path, new_content)?;
+            updated_count += 1;
+            println!("{}", format!("Updated references in: {}", action.path.display()).cyan());
         }
     }
 

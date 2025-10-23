@@ -60,6 +60,8 @@ Each action is a markdown file with specific tags and sections:
 1. **Notes** - General notes about the task
 2. **Statement of Action** - Detailed description of what needs to be done
 3. **Statement of Inputs** - Markdown bullet list of links to dependent actions
+   - Links can be written with or without `.md` extension
+   - Examples: `[Action Name](file.md)` or `[Action Name](file)`
 4. **Statement of Design** - Design details for each output
    - Output - What will be produced
    - Design - How to implement
@@ -83,7 +85,7 @@ Implement secure user authentication with login/logout functionality.
 # Statement of Inputs
 
 - [Design Database Schema](design-database-schema.md)
-- [Setup API Framework](setup-api-framework.md)
+- [Setup API Framework](setup-api-framework)
 
 # Statement of Design
 
@@ -171,7 +173,7 @@ action-lite move action.md subdir/action.md
 This will:
 - Move the action file
 - Move any associated meta-graph directory
-- Update all markdown link references in other actions (smart replacement within `[text](path)` syntax only)
+- Update all markdown link references in other actions (handles both `[text](path.md)` and `[text](path)` formats)
 
 ### Specify Action Directory
 

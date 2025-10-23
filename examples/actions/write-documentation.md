@@ -12,7 +12,7 @@ Create comprehensive API documentation that includes endpoint descriptions, requ
 
 # Statement of Inputs
 
-- [Implement Authentication](implement-authentication.md)
+- [Implement Authentication](implement-authentication)
 
 # Statement of Design
 
