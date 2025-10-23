@@ -107,12 +107,17 @@ Enables all user-specific features and secures the application.
 
 ## CLI Commands
 
+**Note**: By default, actions with status `published` are hidden from lists and graphs. Use the `--show-published` flag to include them.
+
 ### List All Actions
 
-Display all actions with their status and path:
+Display all active actions with their status and path:
 
 ```bash
 action-lite list
+
+# Include published actions
+action-lite list --show-published
 ```
 
 ### List Priority Actions
@@ -121,6 +126,9 @@ Show only actions marked with `#priority`:
 
 ```bash
 action-lite priority
+
+# Include published priority actions
+action-lite priority --show-published
 ```
 
 ### List Actions by Status
@@ -154,6 +162,9 @@ Display a visual dependency graph in the terminal:
 
 ```bash
 action-lite graph
+
+# Include published actions in the graph
+action-lite graph --show-published
 ```
 
 This shows:
@@ -161,6 +172,7 @@ This shows:
 - Child actions indented under their dependencies
 - Status and project for each action
 - Priority markers
+- Published actions are hidden by default (use `--show-published` to include them)
 
 ### Move Action
 

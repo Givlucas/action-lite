@@ -22,6 +22,9 @@ struct Cli {
     #[arg(short, long, default_value = ".", help = "Path to the actions directory")]
     path: PathBuf,
 
+    #[arg(long, global = true, help = "Show published actions (hidden by default)")]
+    show_published: bool,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -246,11 +249,20 @@ fn find_actions(base_path: &Path) -> Result<Vec<Action>> {
     Ok(actions)
 }
 
-fn list_actions(base_path: &Path) -> Result<()> {
-    let actions = find_actions(base_path)?;
+fn list_actions(base_path: &Path, show_published: bool) -> Result<()> {
+    let mut actions = find_actions(base_path)?;
+
+    // Filter out published actions unless flag is set
+    if !show_published {
+        actions.retain(|a| a.status != "published");
+    }
 
     if actions.is_empty() {
-        println!("{}", "No actions found.".yellow());
+        if show_published {
+            println!("{}", "No actions found.".yellow());
+        } else {
+            println!("{}", "No active actions found. Use --show-published to see published actions.".yellow());
+        }
         return Ok(());
     }
 
@@ -267,12 +279,21 @@ fn list_actions(base_path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn list_priority(base_path: &Path) -> Result<()> {
+fn list_priority(base_path: &Path, show_published: bool) -> Result<()> {
     let actions = find_actions(base_path)?;
-    let priority_actions: Vec<_> = actions.iter().filter(|a| a.is_priority).collect();
+    let priority_actions: Vec<_> = actions
+        .iter()
+        .filter(|a| {
+            a.is_priority && (show_published || a.status != "published")
+        })
+        .collect();
 
     if priority_actions.is_empty() {
-        println!("{}", "No priority actions found.".yellow());
+        if show_published {
+            println!("{}", "No priority actions found.".yellow());
+        } else {
+            println!("{}", "No active priority actions found. Use --show-published to see published priorities.".yellow());
+        }
         return Ok(());
     }
 
@@ -378,11 +399,20 @@ fn create_action(base_path: &Path, name: &str, project: &str) -> Result<()> {
     Ok(())
 }
 
-fn graph_actions(base_path: &Path) -> Result<()> {
-    let actions = find_actions(base_path)?;
+fn graph_actions(base_path: &Path, show_published: bool) -> Result<()> {
+    let mut actions = find_actions(base_path)?;
+
+    // Filter out published actions unless flag is set
+    if !show_published {
+        actions.retain(|a| a.status != "published");
+    }
 
     if actions.is_empty() {
-        println!("{}", "No actions found.".yellow());
+        if show_published {
+            println!("{}", "No actions found.".yellow());
+        } else {
+            println!("{}", "No active actions found. Use --show-published to see published actions.".yellow());
+        }
         return Ok(());
     }
 
@@ -629,11 +659,11 @@ fn main() -> Result<()> {
         .context("Failed to resolve path")?;
 
     match cli.command {
-        Commands::List => list_actions(&base_path)?,
-        Commands::Priority => list_priority(&base_path)?,
+        Commands::List => list_actions(&base_path, cli.show_published)?,
+        Commands::Priority => list_priority(&base_path, cli.show_published)?,
         Commands::Status { status } => list_by_status(&base_path, &status)?,
         Commands::New { name, project } => create_action(&base_path, &name, &project)?,
-        Commands::Graph => graph_actions(&base_path)?,
+        Commands::Graph => graph_actions(&base_path, cli.show_published)?,
         Commands::Move { from, to } => move_action(&base_path, &from, &to)?,
     }
 

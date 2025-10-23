@@ -11,15 +11,20 @@ Here are some commands to explore the example actions:
 action-lite --path examples/actions list
 ```
 
+**Note**: Published actions are hidden by default. To see all actions including published ones:
+```bash
+action-lite --path examples/actions list --show-published
+```
+
 ### View the dependency graph
 ```bash
 action-lite --path examples/actions graph
 ```
 
-Expected output showing the dependency tree:
+Expected output (published actions hidden by default):
 ```
 ● implement-authentication [implementation] [auth-system] [PRIORITY]
-  → design-database-schema [published] [auth-system]
+  → Design Database Schema [external]
   → setup-api-framework [design] [auth-system]
 
 ● write-documentation [discovery] [docs-project] [PRIORITY]
@@ -29,8 +34,11 @@ Expected output showing the dependency tree:
   → implement-authentication [implementation] [auth-system] (see above)
 
 ● setup-api-framework [design] [auth-system] (see above)
+```
 
-● design-database-schema [published] [auth-system] (see above)
+To include published actions in the graph:
+```bash
+action-lite --path examples/actions graph --show-published
 ```
 
 ### List priority actions
