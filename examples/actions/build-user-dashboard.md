@@ -10,9 +10,9 @@ Dashboard UI is complete and undergoing testing. Found some minor CSS issues on 
 
 Build a user dashboard that displays key metrics and allows users to manage their account settings.
 
-# Statement of Inputs
+# Statement of inputs
 
-- [Implement Authentication](implement-authentication)
+- [[Implement Authentication]]
 
 # Statement of Design
 

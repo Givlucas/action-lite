@@ -10,10 +10,10 @@ This action implements user authentication for the application. This is a critic
 
 Implement a secure authentication system that supports user login, logout, and session management. The system should use industry-standard practices including password hashing and secure session tokens.
 
-# Statement of Inputs
+# Statement of inputs
 
-- [Design Database Schema](design-database-schema.md)
-- [Setup API Framework](setup-api-framework.md)
+- [[Design Database Schema]]
+- [[Setup API Framework]]
 
 # Statement of Design
 

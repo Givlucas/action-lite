@@ -128,10 +128,12 @@ impl Action {
     fn extract_inputs(content: &str, base_path: &Path) -> Vec<String> {
         let mut inputs = Vec::new();
 
-        // Look for Statement of Inputs section
-        let section_regex = Regex::new(r"(?m)^# Statement of Inputs\s*$").unwrap();
-        // Match markdown links with or without .md extension
-        let link_regex = Regex::new(r"\[([^\]]+)\]\(([^\)]+)\)").unwrap();
+        // Look for Statement of inputs section (case insensitive, handles both "inputs" and "specifications")
+        let section_regex = Regex::new(r"(?mi)^# Statement of (inputs|specifications)\s*$").unwrap();
+        // Match wiki-links: [[Page Name]] or [[page-name.md]]
+        let wiki_link_regex = Regex::new(r"\[\[([^\]]+)\]\]").unwrap();
+        // Also support markdown links: [text](path) or [text](path.md)
+        let md_link_regex = Regex::new(r"\[([^\]]+)\]\(([^\)]+)\)").unwrap();
 
         if let Some(section_match) = section_regex.find(content) {
             let section_start = section_match.end();
@@ -145,10 +147,24 @@ impl Action {
 
             let section_content = &content[section_start..section_end];
 
-            // Extract all markdown links
-            for cap in link_regex.captures_iter(section_content) {
+            // Extract wiki-links first
+            for cap in wiki_link_regex.captures_iter(section_content) {
+                if let Some(link) = cap.get(1) {
+                    let link_str = link.as_str().trim();
+                    // Normalize: ensure .md extension is present
+                    let normalized = if link_str.ends_with(".md") {
+                        link_str.to_string()
+                    } else {
+                        format!("{}.md", link_str)
+                    };
+                    inputs.push(normalized);
+                }
+            }
+
+            // Also extract markdown-style links
+            for cap in md_link_regex.captures_iter(section_content) {
                 if let Some(link) = cap.get(2) {
-                    let link_str = link.as_str();
+                    let link_str = link.as_str().trim();
                     // Normalize: ensure .md extension is present
                     let normalized = if link_str.ends_with(".md") {
                         link_str.to_string()
@@ -526,37 +542,56 @@ fn move_action(base_path: &Path, from: &str, to: &str) -> Result<()> {
     let actions = find_actions(base_path)?;
     let mut updated_count = 0;
 
-    // Create regex patterns to match markdown links with the old path
-    // Match both with and without .md extension
+    // Prepare patterns for both markdown and wiki-link formats
     let from_without_ext = from.strip_suffix(".md").unwrap_or(from);
     let to_without_ext = to.strip_suffix(".md").unwrap_or(to);
 
-    // Pattern 1: Match links with .md extension
-    let link_pattern_with_ext = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from));
-    let link_regex_with_ext = Regex::new(&link_pattern_with_ext)
-        .context("Failed to create replacement regex")?;
+    // Wiki-link patterns: [[from.md]] and [[from]]
+    let wiki_pattern_with_ext = format!(r"\[\[{}\]\]", regex::escape(from));
+    let wiki_regex_with_ext = Regex::new(&wiki_pattern_with_ext)
+        .context("Failed to create wiki-link replacement regex")?;
 
-    // Pattern 2: Match links without .md extension (if from has .md)
-    let link_pattern_without_ext = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from_without_ext));
-    let link_regex_without_ext = Regex::new(&link_pattern_without_ext)
-        .context("Failed to create replacement regex")?;
+    let wiki_pattern_without_ext = format!(r"\[\[{}\]\]", regex::escape(from_without_ext));
+    let wiki_regex_without_ext = Regex::new(&wiki_pattern_without_ext)
+        .context("Failed to create wiki-link replacement regex")?;
+
+    // Markdown link patterns: [text](from.md) and [text](from)
+    let md_pattern_with_ext = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from));
+    let md_regex_with_ext = Regex::new(&md_pattern_with_ext)
+        .context("Failed to create markdown replacement regex")?;
+
+    let md_pattern_without_ext = format!(r"\[([^\]]+)\]\({}\)", regex::escape(from_without_ext));
+    let md_regex_without_ext = Regex::new(&md_pattern_without_ext)
+        .context("Failed to create markdown replacement regex")?;
 
     for action in actions {
         let content = fs::read_to_string(&action.path)?;
         let mut new_content = content.clone();
         let mut modified = false;
 
-        // Replace links with .md extension
-        if link_regex_with_ext.is_match(&new_content) {
-            new_content = link_regex_with_ext.replace_all(&new_content, |caps: &regex::Captures| {
+        // Replace wiki-links with .md extension: [[from.md]] -> [[to.md]]
+        if wiki_regex_with_ext.is_match(&new_content) {
+            new_content = wiki_regex_with_ext.replace_all(&new_content, format!("[[{}]]", to)).to_string();
+            modified = true;
+        }
+
+        // Replace wiki-links without .md extension: [[from]] -> [[to]]
+        if from != from_without_ext && wiki_regex_without_ext.is_match(&new_content) {
+            new_content = wiki_regex_without_ext.replace_all(&new_content, format!("[[{}]]", to_without_ext)).to_string();
+            modified = true;
+        }
+
+        // Replace markdown links with .md extension: [text](from.md) -> [text](to.md)
+        if md_regex_with_ext.is_match(&new_content) {
+            new_content = md_regex_with_ext.replace_all(&new_content, |caps: &regex::Captures| {
                 format!("[{}]({})", &caps[1], to)
             }).to_string();
             modified = true;
         }
 
-        // Replace links without .md extension (only if different from the with-ext pattern)
-        if from != from_without_ext && link_regex_without_ext.is_match(&new_content) {
-            new_content = link_regex_without_ext.replace_all(&new_content, |caps: &regex::Captures| {
+        // Replace markdown links without .md extension: [text](from) -> [text](to)
+        if from != from_without_ext && md_regex_without_ext.is_match(&new_content) {
+            new_content = md_regex_without_ext.replace_all(&new_content, |caps: &regex::Captures| {
                 format!("[{}]({})", &caps[1], to_without_ext)
             }).to_string();
             modified = true;

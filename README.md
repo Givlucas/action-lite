@@ -59,9 +59,10 @@ Each action is a markdown file with specific tags and sections:
 
 1. **Notes** - General notes about the task
 2. **Statement of Action** - Detailed description of what needs to be done
-3. **Statement of Inputs** - Markdown bullet list of links to dependent actions
-   - Links can be written with or without `.md` extension
-   - Examples: `[Action Name](file.md)` or `[Action Name](file)`
+3. **Statement of inputs** - Bullet list of links to dependent actions (also accepts "Statement of specifications")
+   - Supports wiki-links: `[[Action Name]]` or `[[Action Name.md]]` (Obsidian-compatible)
+   - Also supports markdown links: `[Action Name](file.md)` or `[Action Name](file)`
+   - Case-insensitive section header
 4. **Statement of Design** - Design details for each output
    - Output - What will be produced
    - Design - How to implement
@@ -82,10 +83,10 @@ Critical security feature required before launch.
 
 Implement secure user authentication with login/logout functionality.
 
-# Statement of Inputs
+# Statement of inputs
 
-- [Design Database Schema](design-database-schema.md)
-- [Setup API Framework](setup-api-framework)
+- [[Design Database Schema]]
+- [[Setup API Framework]]
 
 # Statement of Design
 
@@ -173,7 +174,7 @@ action-lite move action.md subdir/action.md
 This will:
 - Move the action file
 - Move any associated meta-graph directory
-- Update all markdown link references in other actions (handles both `[text](path.md)` and `[text](path)` formats)
+- Update all link references in other actions (handles both wiki-links `[[name]]` and markdown links `[text](path)`)
 
 ### Specify Action Directory
 

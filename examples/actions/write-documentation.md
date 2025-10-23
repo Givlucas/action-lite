@@ -10,9 +10,9 @@ Need to document all API endpoints and provide examples for developers.
 
 Create comprehensive API documentation that includes endpoint descriptions, request/response examples, and authentication requirements.
 
-# Statement of Inputs
+# Statement of inputs
 
-- [Implement Authentication](implement-authentication)
+- [[Implement Authentication]]
 
 # Statement of Design
 

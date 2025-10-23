@@ -10,7 +10,7 @@ Database schema has been finalized and deployed to production.
 
 Design a comprehensive database schema that supports user accounts, authentication, and application data. The schema must be normalized and optimized for common query patterns.
 
-# Statement of Inputs
+# Statement of inputs
 
 # Statement of Design
 

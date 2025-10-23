@@ -10,7 +10,7 @@ Evaluating between Express and Fastify for the API framework. Need to consider p
 
 Set up the API framework that will serve as the foundation for all backend endpoints. This includes configuring middleware, error handling, and routing structure.
 
-# Statement of Inputs
+# Statement of inputs
 
 # Statement of Design
 
