@@ -62,6 +62,7 @@
             cargo-edit
             clippy
             rustfmt
+            claude-code
           ]);
 
           RUST_SRC_PATH = "${rustToolchain}/lib/rustlib/src/rust/library";
@@ -70,6 +71,7 @@
             echo "🦀 Action Lite development environment"
             echo "Rust version: $(rustc --version)"
             echo "Cargo version: $(cargo --version)"
+            echo "Claude Code version: $(claude --version 2>/dev/null || echo 'not found')"
             echo ""
             echo "Available commands:"
             echo "  cargo build       - Build the project"
@@ -78,6 +80,7 @@
             echo "  cargo clippy      - Run linter"
             echo "  cargo fmt         - Format code"
             echo "  cargo watch       - Watch and rebuild on changes"
+            echo "  claude            - Run Claude Code"
           '';
         };
 
