@@ -3,6 +3,7 @@
 
 use super::{CommandResult, CommandError};
 use crate::scanner;
+use crate::parser;
 use std::path::Path;
 
 /// Execute the list command
@@ -20,18 +21,29 @@ pub fn execute() -> CommandResult {
     let action_files = scanner::scan_actions(actions_dir)
         .map_err(CommandError::ScanError)?;
 
-    // 3. Parse action files (requires parser module - separate action)
-    // let actions = parse_all_actions(action_files)?;
+    // 3. Parse action files
+    let actions = parser::parse_all_actions(action_files)
+        .map_err(CommandError::ParseError)?;
 
-    // 4. Filter for priority (requires parser module)
-    // let priority_actions = filter_priority(actions);
+    // 4. Filter for priority actions
+    let priority_actions: Vec<_> = actions.iter()
+        .filter(|action| action.priority)
+        .collect();
 
-    // 5. Format and output (requires formatter module - separate action)
-    // formatters::list::format_and_print(priority_actions);
-
-    // Placeholder for now
-    println!("List command - implementation pending parser and formatter modules");
-    println!("Found {} action files", action_files.len());
+    // 5. Format and output (simple format for now - formatter module separate action)
+    if priority_actions.is_empty() {
+        println!("No priority actions found.");
+    } else {
+        println!("Priority Actions ({}):\n", priority_actions.len());
+        for action in priority_actions {
+            println!("  {} [{}]", action.title, action.phase);
+            println!("    Path: {}", action.path.display());
+            if !action.project_tags.is_empty() {
+                println!("    Tags: {}", action.project_tags.join(", "));
+            }
+            println!();
+        }
+    }
 
     Ok(())
 }

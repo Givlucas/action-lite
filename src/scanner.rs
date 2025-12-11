@@ -4,8 +4,8 @@
 //! structure and identify all action markdown files, filtering out
 //! documentation and other non-action files.
 
-use std::path::{Path, PathBuf};
 use std::fs;
+use std::path::{Path, PathBuf};
 
 /// Errors that can occur during file system scanning
 #[derive(Debug)]
@@ -105,9 +105,7 @@ fn scan_directory_recursive(dir: &Path, results: &mut Vec<PathBuf>) -> ScanResul
 
     // Iterate over each entry
     for entry in entries {
-        let entry = entry.map_err(|err| {
-            ScanError::IoError(dir.to_path_buf(), err)
-        })?;
+        let entry = entry.map_err(|err| ScanError::IoError(dir.to_path_buf(), err))?;
 
         let path = entry.path();
 
@@ -118,9 +116,8 @@ fn scan_directory_recursive(dir: &Path, results: &mut Vec<PathBuf>) -> ScanResul
             // For files: check if they're action files
             if is_action_file(&path) {
                 // Convert to absolute path using canonicalize
-                let absolute_path = fs::canonicalize(&path).map_err(|err| {
-                    ScanError::IoError(path.clone(), err)
-                })?;
+                let absolute_path =
+                    fs::canonicalize(&path).map_err(|err| ScanError::IoError(path.clone(), err))?;
                 results.push(absolute_path);
             }
         }
@@ -153,7 +150,8 @@ mod tests {
     fn create_file(dir: &Path, name: &str, content: &str) {
         let file_path = dir.join(name);
         let mut file = File::create(file_path).expect("Failed to create test file");
-        file.write_all(content.as_bytes()).expect("Failed to write test file");
+        file.write_all(content.as_bytes())
+            .expect("Failed to write test file");
     }
 
     #[test]
@@ -176,7 +174,10 @@ mod tests {
         let result = scan_actions(&test_dir).expect("Should succeed with single file");
 
         assert_eq!(result.len(), 1, "Should find one action file");
-        assert!(result[0].ends_with("test-action.md"), "Should be the correct file");
+        assert!(
+            result[0].ends_with("test-action.md"),
+            "Should be the correct file"
+        );
 
         // Cleanup
         fs::remove_dir_all(&test_dir).ok();
@@ -232,7 +233,11 @@ mod tests {
 
         let result = scan_actions(&test_dir).expect("Should succeed with mixed types");
 
-        assert_eq!(result.len(), 2, "Should find only .md files excluding README");
+        assert_eq!(
+            result.len(),
+            2,
+            "Should find only .md files excluding README"
+        );
 
         // Cleanup
         fs::remove_dir_all(&test_dir).ok();
@@ -244,7 +249,10 @@ mod tests {
 
         let result = scan_actions(&nonexistent);
 
-        assert!(result.is_err(), "Should return error for nonexistent directory");
+        assert!(
+            result.is_err(),
+            "Should return error for nonexistent directory"
+        );
 
         if let Err(ScanError::DirectoryNotFound(path)) = result {
             assert_eq!(path, nonexistent);

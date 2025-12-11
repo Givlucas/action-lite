@@ -24,8 +24,7 @@ pub enum CommandError {
     /// File system scanning error
     ScanError(crate::scanner::ScanError),
     /// Action parsing error
-    #[allow(dead_code)]
-    ParseError(String),
+    ParseError(crate::parser::ParseError),
     /// Graph building error
     #[allow(dead_code)]
     GraphError(String),
@@ -39,8 +38,8 @@ pub enum CommandError {
 impl fmt::Display for CommandError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            CommandError::ScanError(e) => write!(f, "Scan error: {:?}", e),
-            CommandError::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            CommandError::ScanError(e) => write!(f, "Scan error: {}", e),
+            CommandError::ParseError(e) => write!(f, "Parse error: {}", e),
             CommandError::GraphError(msg) => write!(f, "Graph error: {}", msg),
             CommandError::NoActionsDirectory => write!(f, "No 'actions/' directory found in current location"),
             CommandError::ExecutionError(msg) => write!(f, "Execution error: {}", msg),
