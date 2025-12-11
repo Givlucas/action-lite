@@ -20,6 +20,9 @@ This sub-action implements the Action Parsing Component for the action-lite CLI 
 **How It Fits in the Overall System:**
 This component transforms unstructured markdown into structured data that all other components can work with. It's the bridge between raw files and the tool's internal data model. The dependency resolver, list formatter, and graph visualizer all depend on this component producing well-structured Action objects.
 
+**Design Issue Discovered During Integration Testing:**
+During integration testing with the List Formatter, we discovered that the current design extracts the title from the first markdown heading. However, the action-lite format uses "# Notes" as the first heading in all files, which means all actions display "Notes" as their title - not useful. The design has been revised to extract titles from filenames instead.
+
 # Statement of Action
 
 **What:** A markdown parsing component that reads action files, validates their structure, extracts metadata (tags, title, phase, priority), and produces structured Action objects for use by other components.
@@ -63,9 +66,10 @@ This component implements specifications from the parent action:
    - Error messages must clearly indicate what validation failed
 
 3. **Title Extraction**
-   - Must extract the action title from the first markdown heading (# Heading)
-   - Title should be extracted after the tag line
-   - Must handle titles with special characters or spaces
+   - Must extract the action title from the filename (not from markdown headings)
+   - Must strip the ".md" extension from the filename
+   - Must handle filenames with special characters, spaces, or hyphens
+   - Must preserve the exact filename (minus extension) as the title
 
 4. **Section Parsing**
    - Must identify and extract the "Statement of Inputs" section
@@ -174,10 +178,10 @@ The parser follows a three-stage approach:
 6. Collect all remaining tags as project tags
 
 ### Stage 2: Title Extraction
-1. Scan through lines after the tag line
-2. Find the first markdown heading (line starting with `#`)
-3. Extract text after the `#` and whitespace
-4. Fail if no heading found
+1. Extract filename from the file path
+2. Strip the ".md" extension
+3. Use the resulting string as the title
+4. No validation needed - filename always exists if file was opened
 
 ### Stage 3: Section Extraction
 1. Scan for "Statement of Inputs" heading
@@ -194,10 +198,10 @@ The parser follows a three-stage approach:
 - Priority is detected by presence of `#priority` tag
 
 ### Title Extraction
-- Headings are identified by lines starting with `#`
-- Whitespace after `#` is trimmed
-- Special characters in titles are preserved
-- Empty titles result in an error
+- Extract filename using `Path::file_stem()` to get filename without extension
+- Convert OsStr to String (handle potential UTF-8 issues)
+- Special characters in filenames are preserved
+- No validation needed - if file exists, it has a filename
 
 ### Section Extraction
 - Section headings are identified by lines starting with `#`
@@ -217,10 +221,10 @@ The implementation includes comprehensive unit tests covering:
 - Valid action files with all required elements
 - Missing required tags (action, phase)
 - Multiple phase tags
-- Missing titles
 - Empty files
 - Invalid tag line formats
-- Special characters in titles
+- Filenames with special characters, spaces, and hyphens
+- Title extraction from various filename formats
 - All phase variants
 - Priority and non-priority actions
 - Batch parsing of multiple actions
@@ -560,4 +564,28 @@ Now verifying each specification from the Statement of Specifications against th
 
 All specifications from the Statement of Specifications have been successfully verified against the implementation. The parser is complete, tested, and ready for production use.
 
-**Recommendation:** This action is ready to progress to #document phase for impact analysis.
+## Design Revision and Reimplementation (2025-12-11)
+
+During integration testing with the List Formatter, a design issue was discovered: extracting titles from the first markdown heading resulted in all actions displaying "Notes" as their title, since "# Notes" is the first heading in all action-lite format files.
+
+**Design Change:**
+- Old design: Extract title from first markdown heading
+- New design: Extract title from filename (strip .md extension)
+
+**Implementation Updates:**
+- Modified `extract_title()` function to use `Path::file_stem()` instead of scanning for headings
+- Function signature changed from `extract_title(&[&str], &Path)` to `extract_title(&Path)`
+- Removed `MissingTitle` error variant (no longer needed since files always have names)
+- Updated all 15 unit tests to use meaningful filenames and "# Notes" as first heading
+- Removed `test_parse_missing_title` test (no longer applicable)
+
+**Verification:**
+- All 15 parser unit tests pass
+- No compiler warnings
+- Integration test with `cargo run list` confirms correct action names displayed:
+  - "Build Action-Lite CLI Tool"
+  - "Implement Action Metadata Parser"
+  - "Implement List Formatter"
+  - etc. (instead of "Notes" for all)
+
+**Recommendation:** This action has been re-tested and verified. Ready to progress to #document phase for impact analysis.

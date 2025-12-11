@@ -12,7 +12,7 @@ use std::fs;
 pub struct Action {
     /// Absolute path to the action file
     pub path: PathBuf,
-    /// Action title extracted from first heading
+    /// Action title extracted from filename (without .md extension)
     pub title: String,
     /// Current phase of the action
     pub phase: Phase,
@@ -83,8 +83,6 @@ pub enum ParseError {
     MultiplePhaseTag(PathBuf, Vec<String>),
     /// Invalid tag line format (first line must start with tags)
     InvalidTagLine(PathBuf),
-    /// No title heading found
-    MissingTitle(PathBuf),
     /// Empty file
     EmptyFile(PathBuf),
 }
@@ -109,9 +107,6 @@ impl std::fmt::Display for ParseError {
             }
             ParseError::InvalidTagLine(path) => {
                 write!(f, "Invalid tag line format in {} (first line must contain tags starting with #)", path.display())
-            }
-            ParseError::MissingTitle(path) => {
-                write!(f, "No title heading (# Heading) found in {}", path.display())
             }
             ParseError::EmptyFile(path) => {
                 write!(f, "File is empty: {}", path.display())
@@ -156,8 +151,8 @@ pub fn parse_action(path: &Path) -> ParseResult<Action> {
     // Parse first line for tags
     let (phase, priority, project_tags) = parse_tag_line(lines[0], path)?;
 
-    // Extract title from first heading
-    let title = extract_title(&lines, path)?;
+    // Extract title from filename
+    let title = extract_title(path)?;
 
     // Extract Statement of Inputs section
     let statement_of_inputs = extract_section(&lines, "Statement of Inputs");
@@ -251,21 +246,18 @@ fn parse_tag_line(line: &str, path: &Path) -> ParseResult<(Phase, bool, Vec<Stri
     Ok((phase, priority, project_tags))
 }
 
-/// Extract the title from the first markdown heading
-fn extract_title(lines: &[&str], path: &Path) -> ParseResult<String> {
-    for line in lines {
-        let trimmed = line.trim();
+/// Extract the title from the filename (without .md extension)
+fn extract_title(path: &Path) -> ParseResult<String> {
+    // Extract filename without extension
+    let file_stem = path.file_stem()
+        .ok_or_else(|| ParseError::InvalidUtf8(path.to_path_buf()))?;
 
-        // Look for markdown heading (starts with # followed by space)
-        if trimmed.starts_with("# ") {
-            let title = trimmed[2..].trim().to_string();
-            if !title.is_empty() {
-                return Ok(title);
-            }
-        }
-    }
+    // Convert to string
+    let title = file_stem.to_str()
+        .ok_or_else(|| ParseError::InvalidUtf8(path.to_path_buf()))?
+        .to_string();
 
-    Err(ParseError::MissingTitle(path.to_path_buf()))
+    Ok(title)
 }
 
 /// Extract a section's content by heading name
@@ -373,7 +365,7 @@ mod tests {
         let test_dir = create_temp_dir("valid_action");
         let content = r#"#action #design #action-lite #priority
 
-# Test Action Title
+# Notes
 
 Some content here.
 
@@ -381,7 +373,7 @@ Some content here.
 
 This action depends on something.
 "#;
-        let file_path = create_test_file(&test_dir, "test.md", content);
+        let file_path = create_test_file(&test_dir, "Test Action Title.md", content);
 
         let result = parse_action(&file_path);
         assert!(result.is_ok(), "Should successfully parse valid action");
@@ -403,9 +395,9 @@ This action depends on something.
         let test_dir = create_temp_dir("no_priority");
         let content = r#"#action #implementation #rust
 
-# Implementation Task
+# Notes
 "#;
-        let file_path = create_test_file(&test_dir, "test.md", content);
+        let file_path = create_test_file(&test_dir, "Implementation Task.md", content);
 
         let result = parse_action(&file_path);
         assert!(result.is_ok());
@@ -507,27 +499,6 @@ This action depends on something.
     }
 
     #[test]
-    fn test_parse_missing_title() {
-        let test_dir = create_temp_dir("missing_title");
-        let content = r#"#action #design
-
-Some content without a title heading.
-"#;
-        let file_path = create_test_file(&test_dir, "test.md", content);
-
-        let result = parse_action(&file_path);
-        assert!(result.is_err());
-
-        match result {
-            Err(ParseError::MissingTitle(_)) => {}
-            _ => panic!("Expected MissingTitle error"),
-        }
-
-        // Cleanup
-        fs::remove_dir_all(&test_dir).ok();
-    }
-
-    #[test]
     fn test_parse_empty_file() {
         let test_dir = create_temp_dir("empty");
         let content = "";
@@ -558,8 +529,8 @@ Some content without a title heading.
 
         for (tag, expected_phase) in phases {
             let test_dir = create_temp_dir(&format!("phase_{}", tag));
-            let content = format!("#action {} #test-tag\n\n# Title\n", tag);
-            let file_path = create_test_file(&test_dir, "test.md", &content);
+            let content = format!("#action {} #test-tag\n\n# Notes\n", tag);
+            let file_path = create_test_file(&test_dir, "Phase Test Action.md", &content);
 
             let result = parse_action(&file_path);
             assert!(result.is_ok());
@@ -577,7 +548,7 @@ Some content without a title heading.
         let test_dir = create_temp_dir("section_present");
         let content = r#"#action #design
 
-# Title
+# Notes
 
 # Statement of Inputs
 
@@ -588,7 +559,7 @@ It has multiple lines.
 
 This should not be included.
 "#;
-        let file_path = create_test_file(&test_dir, "test.md", content);
+        let file_path = create_test_file(&test_dir, "Section Test.md", content);
 
         let result = parse_action(&file_path);
         assert!(result.is_ok());
@@ -610,13 +581,13 @@ This should not be included.
         let test_dir = create_temp_dir("section_missing");
         let content = r#"#action #design
 
-# Title
+# Notes
 
 # Some Other Section
 
 Content here.
 "#;
-        let file_path = create_test_file(&test_dir, "test.md", content);
+        let file_path = create_test_file(&test_dir, "Missing Section Test.md", content);
 
         let result = parse_action(&file_path);
         assert!(result.is_ok());
@@ -647,9 +618,9 @@ Content here.
         let test_dir = create_temp_dir("multi_tags");
         let content = r#"#action #design #rust #cli #priority #backend
 
-# Title
+# Notes
 "#;
-        let file_path = create_test_file(&test_dir, "test.md", content);
+        let file_path = create_test_file(&test_dir, "Multi Tag Action.md", content);
 
         let result = parse_action(&file_path);
         assert!(result.is_ok());
@@ -670,17 +641,15 @@ Content here.
         let test_dir = create_temp_dir("special_chars");
         let content = r#"#action #design
 
-# Title with "quotes" and symbols: #$%!
-
-Content
+# Notes
 "#;
-        let file_path = create_test_file(&test_dir, "test.md", content);
+        let file_path = create_test_file(&test_dir, "Build & Deploy (Production).md", content);
 
         let result = parse_action(&file_path);
         assert!(result.is_ok());
 
         let action = result.unwrap();
-        assert_eq!(action.title, r#"Title with "quotes" and symbols: #$%!"#);
+        assert_eq!(action.title, "Build & Deploy (Production)");
 
         // Cleanup
         fs::remove_dir_all(&test_dir).ok();
@@ -690,11 +659,11 @@ Content
     fn test_parse_all_actions_success() {
         let test_dir = create_temp_dir("parse_all");
 
-        let content1 = "#action #design\n\n# Action One\n";
-        let content2 = "#action #test #priority\n\n# Action Two\n";
+        let content1 = "#action #design\n\n# Notes\n";
+        let content2 = "#action #test #priority\n\n# Notes\n";
 
-        let file1 = create_test_file(&test_dir, "action1.md", content1);
-        let file2 = create_test_file(&test_dir, "action2.md", content2);
+        let file1 = create_test_file(&test_dir, "Action One.md", content1);
+        let file2 = create_test_file(&test_dir, "Action Two.md", content2);
 
         let paths = vec![file1, file2];
         let result = parse_all_actions(paths);
@@ -702,6 +671,8 @@ Content
         assert!(result.is_ok());
         let actions = result.unwrap();
         assert_eq!(actions.len(), 2);
+        assert_eq!(actions[0].title, "Action One");
+        assert_eq!(actions[1].title, "Action Two");
 
         // Cleanup
         fs::remove_dir_all(&test_dir).ok();
@@ -711,11 +682,11 @@ Content
     fn test_parse_all_actions_fails_on_malformed() {
         let test_dir = create_temp_dir("parse_all_fail");
 
-        let content1 = "#action #design\n\n# Valid Action\n";
-        let content2 = "Not a valid action\n\n# Title\n"; // Missing tags
+        let content1 = "#action #design\n\n# Notes\n";
+        let content2 = "Not a valid action\n\n# Notes\n"; // Missing tags
 
-        let file1 = create_test_file(&test_dir, "action1.md", content1);
-        let file2 = create_test_file(&test_dir, "action2.md", content2);
+        let file1 = create_test_file(&test_dir, "Valid Action.md", content1);
+        let file2 = create_test_file(&test_dir, "Invalid Action.md", content2);
 
         let paths = vec![file1, file2];
         let result = parse_all_actions(paths);
