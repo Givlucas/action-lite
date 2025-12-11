@@ -1,5 +1,7 @@
 # Rust
 target/
+**/*.rs.bk
+Cargo.lock  # Lock file is typically gitignored for binaries
 
 # IDE
 .vscode/

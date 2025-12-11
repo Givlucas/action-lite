@@ -1,0 +1,20 @@
+[package]
+name = "action-lite"
+version = "0.1.0"
+edition = "2021"
+authors = ["action-lite contributors"]
+description = "Command-line tool for visualizing and managing action-lite methodology workflows"
+license = "MIT OR Apache-2.0"  # Standard Rust dual-license
+repository = "https://github.com/Givlucas/action-lite"  # Adjust if different
+
+# Binary target configuration
+[[bin]]
+name = "action-lite"
+path = "src/main.rs"
+
+[dependencies]
+# Dependencies will be added as implementation progresses
+# Initially empty - just enough to build a minimal binary
+
+[dev-dependencies]
+# Test dependencies will be added later
