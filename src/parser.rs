@@ -33,6 +33,7 @@ pub enum Phase {
     Test,
     Document,
     Publish,
+    Published,
 }
 
 impl Phase {
@@ -45,6 +46,7 @@ impl Phase {
             "#test" => Some(Phase::Test),
             "#document" => Some(Phase::Document),
             "#publish" => Some(Phase::Publish),
+            "#published" => Some(Phase::Published),
             _ => None,
         }
     }
@@ -58,6 +60,7 @@ impl Phase {
             Phase::Test => "#test",
             Phase::Document => "#document",
             Phase::Publish => "#publish",
+            Phase::Published => "#published",
         }
     }
 }
@@ -100,7 +103,7 @@ impl std::fmt::Display for ParseError {
                 write!(f, "Missing required #action tag in first line: {}", path.display())
             }
             ParseError::MissingPhaseTag(path) => {
-                write!(f, "No phase tag found in first line (expected one of: #discovery, #design, #implementation, #test, #document, #publish): {}", path.display())
+                write!(f, "No phase tag found in first line (expected one of: #discovery, #design, #implementation, #test, #document, #publish, #published): {}", path.display())
             }
             ParseError::MultiplePhaseTag(path, phases) => {
                 write!(f, "Multiple phase tags found in {}: {}", path.display(), phases.join(", "))
@@ -525,6 +528,7 @@ This action depends on something.
             ("#test", Phase::Test),
             ("#document", Phase::Document),
             ("#publish", Phase::Publish),
+            ("#published", Phase::Published),
         ];
 
         for (tag, expected_phase) in phases {
