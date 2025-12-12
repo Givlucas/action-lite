@@ -67,10 +67,30 @@ Multiple outputs can be specified with additional output/design pairs.
 **Design Guidelines:**
 - Write designs in **plain English**, not code
 - Describe what will be built and how it will work conceptually
-- Code snippets are acceptable for clarification (e.g., showing an API signature)
-- Key logic should use **pseudocode ONLY** if absolutely necessary
 - Focus on the approach and architecture, not the implementation details
 - The design should guide implementation, not be the implementation
+
+**What TO Include:**
+- High-level architecture and component relationships
+- Design decisions with rationale (what choices were made and why)
+- Data structure concepts (e.g., "use an adjacency list for the graph")
+- Algorithm approaches (e.g., "use depth-first search for cycle detection")
+- Trade-offs between alternatives considered
+- Error handling strategy
+- Edge cases to consider
+
+**What NOT TO Include:**
+- Complete function implementations
+- Full code listings with all details
+- Line-by-line code walkthroughs
+- Detailed implementation logic that should be figured out during implementation
+- Code that would be copied directly into the implementation
+
+**Minimal Code Usage:**
+- Type signatures/interfaces are acceptable (e.g., `fn build_graph(actions: Vec<Action>) -> Result<Graph>`)
+- Simple struct definitions showing key fields are acceptable
+- Short examples (2-3 lines) to clarify a concept are acceptable
+- Pseudocode ONLY if absolutely necessary for complex logic, and keep it brief
 
 ### 6. Analysis of Impact
 How the implementation affects the system, lessons learned, side effects, and considerations for future work.
