@@ -10,6 +10,7 @@ use std::process::ExitCode;
 mod commands;
 mod scanner;
 mod parser;
+mod dependency;
 // Other modules will be added as they're implemented
 
 use commands::Command;
