@@ -25,6 +25,8 @@ pub enum CommandError {
     ScanError(crate::scanner::ScanError),
     /// Action parsing error
     ParseError(crate::parser::ParseError),
+    /// Dependency resolution error
+    DependencyError(crate::dependency::DependencyError),
     /// Graph building error
     #[allow(dead_code)]
     GraphError(String),
@@ -40,6 +42,7 @@ impl fmt::Display for CommandError {
         match self {
             CommandError::ScanError(e) => write!(f, "Scan error: {}", e),
             CommandError::ParseError(e) => write!(f, "Parse error: {}", e),
+            CommandError::DependencyError(e) => write!(f, "Dependency error: {}", e),
             CommandError::GraphError(msg) => write!(f, "Graph error: {}", msg),
             CommandError::NoActionsDirectory => write!(f, "No 'actions/' directory found in current location"),
             CommandError::ExecutionError(msg) => write!(f, "Execution error: {}", msg),

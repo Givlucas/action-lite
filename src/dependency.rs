@@ -116,7 +116,7 @@ pub fn build_dependency_graph(actions: Vec<Action>) -> DependencyResult<Dependen
     let resolved_dependencies = resolve_references(&actions, &raw_dependencies)?;
 
     // Stage 3: Construct the graph structure
-    let mut graph = construct_graph(&actions, &resolved_dependencies);
+    let graph = construct_graph(&actions, &resolved_dependencies);
 
     // Stage 4: Detect cycles in the graph
     detect_cycles(&graph)?;

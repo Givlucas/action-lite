@@ -1,4 +1,4 @@
-#action #implementation #action-lite #priority
+#action #test #action-lite #priority
 
 # Notes
 
@@ -47,13 +47,13 @@ This action has been broken down into sub-actions (meta-graph):
 
 **Sub-Actions:**
 
-1. [Configure Nix Build with Naersk](./Build Action-Lite CLI Tool/Configure Nix Build with Naersk.md) - Set up Nix flake with naersk for building Rust CLI (#document phase - Complete)
-2. [Implement File System Scanner](./Build Action-Lite CLI Tool/Implement File System Scanner.md) - Recursive directory traversal and markdown file discovery (#document phase - Complete)
-3. [Implement Action Metadata Parser](./Build Action-Lite CLI Tool/Implement Action Metadata Parser.md) - Parse tags, titles, and section structure from markdown (#test phase - Implementation complete, all tests passing)
-4. [Implement CLI Command Interface](./Build Action-Lite CLI Tool/Implement CLI Command Interface.md) - Parse arguments and dispatch to list/graph commands (#document phase - Complete)
-5. [Implement List Formatter](./Build Action-Lite CLI Tool/Implement List Formatter.md) - Format priority actions for list command (#design phase - Awaiting implementation)
-6. [Implement Dependency Parser and Graph Builder](./Build Action-Lite CLI Tool/Implement Dependency Parser and Graph Builder.md) - Extract dependencies from markdown links and build DAG (#design phase - Awaiting implementation)
-7. [Implement Graph Visualizer](./Build Action-Lite CLI Tool/Implement Graph Visualizer.md) - Render DAG as unicode tree structure (#design phase - Awaiting implementation)
+1. [Configure Nix Build with Naersk](./Build Action-Lite CLI Tool/Configure Nix Build with Naersk.md) - Set up Nix flake with naersk for building Rust CLI (#published - Complete)
+2. [Implement File System Scanner](./Build Action-Lite CLI Tool/Implement File System Scanner.md) - Recursive directory traversal and markdown file discovery (#published - Complete)
+3. [Implement Action Metadata Parser](./Build Action-Lite CLI Tool/Implement Action Metadata Parser.md) - Parse tags, titles, and section structure from markdown (#published - Complete)
+4. [Implement CLI Command Interface](./Build Action-Lite CLI Tool/Implement CLI Command Interface.md) - Parse arguments and dispatch to list/graph commands (#published - Complete)
+5. [Implement List Formatter](./Build Action-Lite CLI Tool/Implement List Formatter.md) - Format priority actions for list command (#published - Complete)
+6. [Implement Dependency Parser and Graph Builder](./Build Action-Lite CLI Tool/Implement Dependency Parser and Graph Builder.md) - Extract dependencies from markdown links and build DAG (#published - Complete)
+7. [Implement Graph Visualizer](./Build Action-Lite CLI Tool/Implement Graph Visualizer.md) - Render DAG as unicode tree structure (#published - Complete)
 
 **Knowledge Dependencies:**
 - action-lite format specification (tag structure, file organization, meta-graphs)

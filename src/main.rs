@@ -11,6 +11,7 @@ mod commands;
 mod scanner;
 mod parser;
 mod dependency;
+mod visualizer;
 // Other modules will be added as they're implemented
 
 use commands::Command;

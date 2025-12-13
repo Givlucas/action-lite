@@ -3,6 +3,9 @@
 
 use super::{CommandResult, CommandError};
 use crate::scanner;
+use crate::parser;
+use crate::dependency;
+use crate::visualizer;
 use std::path::Path;
 
 /// Execute the graph command
@@ -20,18 +23,19 @@ pub fn execute() -> CommandResult {
     let action_files = scanner::scan_actions(actions_dir)
         .map_err(CommandError::ScanError)?;
 
-    // 3. Parse action files (requires parser module - separate action)
-    // let actions = parse_all_actions(action_files)?;
+    // 3. Parse action files
+    let actions: Result<Vec<_>, _> = action_files
+        .iter()
+        .map(|path| parser::parse_action(path))
+        .collect();
+    let actions = actions.map_err(CommandError::ParseError)?;
 
-    // 4. Build dependency graph (requires graph_builder module - separate action)
-    // let graph = graph_builder::build_graph(actions)?;
+    // 4. Build dependency graph
+    let graph = dependency::build_dependency_graph(actions)
+        .map_err(CommandError::DependencyError)?;
 
-    // 5. Format and output (requires formatter module - separate action)
-    // formatters::graph::format_and_print(graph);
-
-    // Placeholder for now
-    println!("Graph command - implementation pending parser, graph builder, and formatter modules");
-    println!("Found {} action files", action_files.len());
+    // 5. Visualize and output
+    visualizer::render_graph(graph);
 
     Ok(())
 }

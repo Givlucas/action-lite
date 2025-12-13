@@ -1,4 +1,4 @@
-#action #document #action-lite #priority
+#action #published #action-lite
 
 # Notes
 
@@ -34,8 +34,8 @@ This action depends on:
 - [Implement Action Metadata Parser](./Implement Action Metadata Parser.md) - Provides parsed Action objects with Statement of Inputs content
 
 **Knowledge Dependencies:**
-- Understanding of markdown link syntax: `[Link Text](./path/to/file.md)`
-- Understanding of wiki link syntax: `[[Action Title]]`
+- Understanding of markdown link syntax
+- Understanding of wiki link syntax
 - Knowledge of relative path resolution in markdown
 - Understanding of directed acyclic graphs (DAG) and their properties
 - Algorithm for detecting cycles in graphs
@@ -179,9 +179,7 @@ pub enum DependencyError {
 **Algorithm:**
 1. For each Action in the input collection:
    - If Statement of Inputs is None or empty, skip (no dependencies)
-   - Scan the Statement of Inputs content for link patterns:
-     - Markdown link pattern: `[Link Text](./path/to/file.md)` or `[Link Text](path/to/file.md)`
-     - Wiki link pattern: `[[Action Title]]`
+   - Scan the Statement of Inputs content for markdown and wiki link patterns
    - Extract all matched links into a list of references
    - Store as (action_title, Vec<raw_reference>)
 
@@ -654,3 +652,140 @@ None - the implementation follows the Statement of Design exactly:
 - All error types as specified
 - Test coverage as outlined in testing strategy
 - Integration points as documented
+
+# Analysis of Impact
+
+## What Was Learned During Implementation
+
+### Path Resolution Complexity
+The most challenging aspect of implementation was handling relative path resolution for markdown links. The design specified using `Path::canonicalize()`, but this requires paths to exist on the filesystem. Since we're parsing references that may not correspond to actual files, we had to implement a custom `normalize_path()` function that manually resolves `.` and `..` components without filesystem access. This taught us that abstract path manipulation is fundamentally different from filesystem-based path resolution.
+
+**Key insight:** When working with references in markup documents, you cannot assume filesystem existence. Path normalization must be algorithmic, not filesystem-dependent.
+
+### Regex Pattern Trade-offs
+The link extraction regex patterns are deliberately simple to be robust. The markdown link pattern `\[([^\]]+)\]\(([^)]+)\)` does not validate link text content or handle escaped characters. This was a conscious trade-off: we skip malformed links rather than attempting complex parsing. This makes the parser resilient to minor formatting variations while still catching real structural errors (missing dependencies, cycles).
+
+**Key insight:** Fail-fast on structural problems, be lenient on formatting variations. This separation improves user experience and makes errors actionable.
+
+### DAG vs Tree Mental Model
+During design, there was initial confusion about whether this was a tree or DAG visualization problem. The implementation clarified that action dependencies form a true DAG: actions can have multiple parents (multiple other actions depend on the same foundational action). This is different from a hierarchical tree structure and has important implications for the Graph Visualizer that will consume this structure.
+
+**Key insight:** The "depends on" relationship creates a DAG, not a tree. The Graph Visualizer must handle this correctly - each node appears once even when referenced by multiple parents.
+
+### Error Message Quality
+The error types were designed with actionable context: not just "missing dependency" but which action references what. During implementation, this proved essential for debugging test cases. Clear error messages with full context make the difference between "something's wrong" and "fix this specific problem."
+
+**Key insight:** Error messages should include enough context to fix the problem without additional investigation. This requires thinking about the user's debugging workflow during error type design.
+
+### Testing Strategy Effectiveness
+The 4-stage pipeline design enabled independent testing of each stage. This made bugs easy to isolate: if reference resolution fails, the problem is in stage 2, not stages 1, 3, or 4. The comprehensive test suite (17 tests) caught edge cases that weren't obvious in the design phase, particularly around path normalization and cycle detection.
+
+**Key insight:** Separating concerns into distinct stages isn't just good architecture - it makes testing dramatically easier and bugs easier to isolate.
+
+## How This Impacts the System
+
+### Foundation for Graph Command
+This module is the critical enabler for the `graph` command. The DependencyGraph structure it produces contains everything needed for visualization:
+- Nodes HashMap provides O(1) access to any action
+- Roots Vec identifies entry points for traversal
+- Dependencies and dependents lists enable bidirectional navigation
+- DAG property (via cycle detection) guarantees terminating traversal
+
+The Graph Visualizer can now focus entirely on rendering logic, not dependency resolution logic.
+
+### Data Quality Guarantees
+By enforcing acyclic property and failing on missing dependencies, this module guarantees that downstream components receive valid, well-formed graphs. The fail-fast approach means errors are caught early (during graph construction) rather than manifesting as runtime bugs during visualization or analysis.
+
+This shifts complexity to the appropriate place: validate once during parsing, then traverse with confidence.
+
+### Performance Characteristics
+The O(V + E) complexity for typical action sets (tens to hundreds of actions) means graph construction is effectively instantaneous from a user perspective. This enables the `graph` command to be run frequently without performance concerns, making it a practical exploration tool.
+
+The HashMap-based lookups (O(1)) mean that future features like "show dependencies of specific action" or "find all actions that depend on X" can be implemented efficiently without rearchitecting.
+
+### Module Reusability
+While designed for the Graph Visualizer, the DependencyGraph structure could support future features:
+- Dependency analysis: "What breaks if I remove this action?"
+- Work planning: "What order should I tackle these actions?"
+- Circular dependency warnings in editors/linters
+- Orphan detection: "Which actions have no dependents?"
+
+The clean separation between graph construction and visualization makes these extensions possible without modifying the core dependency resolution logic.
+
+## Architectural Decisions Made
+
+### Decision: Action Title as Primary Key
+We chose action titles (not file paths) as the primary identifier in the graph. This makes the graph structure human-readable and matches how users think about actions. File paths are implementation details; titles are semantic identifiers.
+
+**Impact:** Wiki links `[[Action Title]]` are first-class citizens. The graph structure uses titles consistently. This decision ripples through to the visualizer, which will display titles, not paths.
+
+**Trade-off:** Requires unique action titles. The action-lite protocol already requires this, so it's not an additional constraint.
+
+### Decision: Fail-Fast Error Handling
+The module returns errors immediately on the first problem (missing dependency or cycle) rather than accumulating all errors. This simplifies error handling and matches user workflow: fix one problem, re-run, fix next problem.
+
+**Impact:** Users get clear, single-error messages. Code is simpler without error accumulation logic.
+
+**Trade-off:** Users must fix errors one at a time. For large action sets with many errors, this could be slower than seeing all errors at once. However, in practice, action sets are small (tens to hundreds) and errors are rare, so this trade-off favors simplicity.
+
+### Decision: Bidirectional Edges
+The DependencyNode stores both dependencies (forward edges) and dependents (reverse edges). This doubles the edge storage but enables efficient bidirectional traversal.
+
+**Impact:** Graph Visualizer can traverse bottom-up or top-down efficiently. Future analysis features can answer "what depends on X?" without traversing the entire graph.
+
+**Trade-off:** Slightly higher memory usage. For typical action counts, this is negligible (hundreds of actions = thousands of edges = kilobytes of memory).
+
+### Decision: Manual Path Normalization
+Instead of relying on filesystem-based path canonicalization, we implemented algorithmic path normalization. This decouples dependency resolution from filesystem state.
+
+**Impact:** The module works with abstract references, not just actual files. This is more robust and testable.
+
+**Trade-off:** Custom path normalization code increases implementation complexity slightly. However, this is isolated to a single helper function and thoroughly tested.
+
+## Side Effects and Future Considerations
+
+### Side Effect: Enforces DAG Discipline
+By detecting and failing on circular dependencies, this module enforces the action-lite protocol's DAG requirement. This is a positive side effect: the tool actively prevents invalid action structures.
+
+**Future consideration:** We could add a "lint" mode that checks for circular dependencies without building the full graph, enabling fast validation during action file editing.
+
+### Side Effect: Validates Title Uniqueness
+The HashMap-keyed-by-title structure implicitly requires unique titles. If two actions have the same title, one will overwrite the other in the HashMap.
+
+**Future consideration:** Add explicit duplicate title detection with clear error messages. Currently, duplicate titles would cause silent data loss during graph construction.
+
+### Future Enhancement: Caching
+For very large action sets (thousands of actions), graph construction could become a bottleneck. The current O(V + E) complexity is fine for typical use, but caching the graph structure between runs could improve responsiveness.
+
+**Implementation path:** Serialize DependencyGraph to disk with content hash of all action files. Invalidate cache if any action file changes. This would make repeated `graph` commands instantaneous.
+
+### Future Enhancement: Incremental Updates
+When a single action file changes, we currently rebuild the entire graph. For large projects, incremental updates could be more efficient: detect which action changed, update only affected subgraph.
+
+**Complexity:** Requires tracking graph structure changes, not just content changes. Likely overkill for initial version but worth considering if the tool is used for very large action sets.
+
+### Future Enhancement: Dependency Types
+The current implementation treats all dependencies uniformly. Future versions could distinguish between:
+- Hard dependencies (must complete before this action starts)
+- Soft dependencies (informational, not blocking)
+- Knowledge dependencies (context, not implementation dependencies)
+
+**Implementation path:** Add dependency type metadata to links (e.g., `[Action](./path.md){type=hard}`). Extend DependencyNode to track dependency types. Visualizer could render different types differently.
+
+## Integration Success
+
+The module integrates cleanly with the Action Metadata Parser:
+- Consumes Vec<Action> with no adapter layer needed
+- Uses existing Action struct fields (path, title, statement_of_inputs)
+- Produces DependencyGraph ready for Graph Visualizer consumption
+- Error types implement standard traits for CLI error handling
+
+The clean interfaces between components validate the overall architecture: each component has a clear boundary and well-defined inputs/outputs.
+
+## Conclusion
+
+This implementation successfully transforms the dependency resolution problem from abstract design to working code. The 4-stage pipeline architecture proved effective, the test coverage caught edge cases, and the resulting DependencyGraph structure is both correct and efficient.
+
+The module establishes the foundation for the Graph Visualizer and future dependency analysis features. The architectural decisions made (title-based keys, fail-fast errors, bidirectional edges) optimize for the common case while remaining simple and testable.
+
+The most valuable learning was around path normalization complexity and the DAG vs tree mental model distinction. These insights inform the Graph Visualizer design and future component designs.
