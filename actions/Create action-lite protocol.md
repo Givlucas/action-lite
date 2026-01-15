@@ -2,7 +2,7 @@
 #Discovery
 
 # Notes
-- Instead of tags maybe we should have a fomatter header
+- Instead of tags for meta data frontmatter header
 
 # Statement of action
 

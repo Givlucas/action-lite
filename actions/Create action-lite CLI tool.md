@@ -1,6 +1,9 @@
 #action #action-lite
 #Discovery
 
+# Notes
+- Look at the "beads" AI tool. (you have it stared in github)
+
 # Statement of Specifications
 - Built in rust
 - contains a nix flake for development and packaging
@@ -9,7 +12,7 @@
         - list priority items
         - list continuous items
         - list items by status
-        - create a new empty action with all sections
+        - create a new empty action with all sections and frontmatter
         - add new inputs to an action
         - move actions and update all input references to them
         - change the status of an action
