@@ -94,12 +94,9 @@ Action files start with a frontmatter header that track the following informatio
 - the owners of an action (list of strings)
 - the current state of the action
 - priority yes/no
-- dirty flag
+- continuous yes/no
 
 # Statements
-
-State tags maybe present at any point of the file but only one should occur per file.
-
 Actions may also be tagged with \#priority to mark them as important. But the tag should be removed once completed.
 
 Some actions have no end. These are marked \#continuous and are forever in the "implementation" stage
