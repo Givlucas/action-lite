@@ -47,7 +47,7 @@ Action documents have an associated state which tracks what phase of the action 
 6. published - Available for use. (stable state)
 
 # States
-Actions states are designed to bake in convergent and divergent thinking at different stages. This Ensures that individuals completing actions are given time to research and discover possible solutions before design & implementation.
+Actions states are designed to bake in convergent and divergent thinking at different stages. This Ensures that individuals completing actions are given time to research and discover possible solutions before design & implementation. Think of the action workflow as a mix between the waterfall process and scrum. Each metagraph is its own backlog, and each action item is its own mini waterfall.
 
 ## Discovery - Divergent thinking
 The discovery stage is vitally important and serves as the foundation to the rest of the states. Improperly completed discovery may cause a failure in design and implementation. In this state users are encouraged to learn about the problem space. Do research and take notes on what a solution to the stated action would look like. This state generates: notes, Statement of action, Statement of Inputs, and Statement of specifications. It is not required that one user be entirely responsible for all outputs of this stage. One user could create the action item and the statement of action but leave the statement of specifications blank. Another user could continue the action and fill out the statement of specifications.
@@ -81,25 +81,20 @@ Think of it as a discovery state against the output itself.
 
 If this state fails then the user can return to any of the previous states and re-start the cycle.
 
+This state does not produce any documents other then possible learnings which can be added to the "notes" section
+
 ## Document - Convergent
-Although action handles architecture documentation, it does not handle other forms. Like user or developer documentation. This stage is designed to give the user space to document how to use their output
+Although action handles architecture documentation, it does not handle other forms. Like user or developer documentation. This stage is designed to give the user space to document how to use their output. However architecture documentation should not be duplicated outside of action.
 
 ## Published (end state)
 This is the end state of an action. Once an action has been completed and its outputs have been made available for use, then it can move to this state.
 
 The definition of "made available for use" varies per action and domain but is vitally important. An action cannot be considered complete if its outputs are not usable for other actions to consume as inputs.
 
-# Dependency
-The graph nature of action ensures designs are consistent. For example. Let's say a "Create HTTP service" action is determined to need to be re-worked later in development. Modifying the "Create HTTP service" makes all of Actions that rely on its outputs "dirty". This notifies the developer and if they wish, they can review all child actions.
-
-# Format of an action file
-Action files start with a frontmatter header that track the following information.
+# action metadata
+Action markdown files start with a frontmatter header that track the following information.
 - the owners of an action (list of strings)
 - the current state of the action
 - priority yes/no
 - continuous yes/no
 
-# Statements
-Actions may also be tagged with \#priority to mark them as important. But the tag should be removed once completed.
-
-Some actions have no end. These are marked \#continuous and are forever in the "implementation" stage
