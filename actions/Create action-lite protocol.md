@@ -1,5 +1,5 @@
 #action #priority
-#Design
+#document
 
 # Notes
 - Instead of tags for metadata frontmatter header
