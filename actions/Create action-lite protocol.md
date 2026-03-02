@@ -13,7 +13,7 @@ Create an action-lite system which is compatible with the limitations of the fil
 
 # Statement of design
 
- Action lite is an agile file based task tracking system that uses acyclic directed metagraphs to track task requirements, state, strategy, and dependency. The goal of action is to directly link task management to architecture design. Action items are documents which declare the expected outcome of a system and how to get there in plain English, in terms of direct actionable tasks. By declaring this information Architecture requirements and designs are immediatly avaiable as tasks which can be assigned. No need to translate large architecture documents into individual PBIs, duplucating information.
+ Action lite is an agile file based task tracking system that uses acyclic directed metagraphs to track task requirements, state, strategy, and dependency. The goal of action is to directly link task management to architecture design. Action items are documents which declare the expected outcome of a system and how to get there in plain English, in terms of direct actionable tasks. By declaring this information Architecture requirements and designs are immediatly avaiable as tasks which can be assigned. No need to translate large architecture documents into individual PBIs, duplucating information. It should be possible to take action tree, start the project from scratch (clean room), and arrive at a similar implementation.
 
 Action lite uses a directory "actions" to store all of its tasks which will be referred to as "actions". Each action is stored in a markdown file and has a frontmatter header for storing metadata. Action items create a dependency graph by declaring what actions they rely on explicitly as inputs, and directly state their expected outcome will be.
 
@@ -50,7 +50,7 @@ Action documents have an associated state which tracks what phase of the action 
 Actions states are designed to bake in convergent and divergent thinking at different stages. This Ensures that individuals completing actions are given time to research and discover possible solutions before design & implementation. Think of the action workflow as a mix between the waterfall process and scrum. Each metagraph is its own backlog, and each action item is its own mini waterfall.
 
 ## Discovery - Divergent thinking
-The discovery stage is vitally important and serves as the foundation to the rest of the states. Improperly completed discovery may cause a failure in design and implementation. In this state users are encouraged to learn about the problem space. Do research and take notes on what a solution to the stated action would look like. This state generates: notes, Statement of action, Statement of Inputs, and Statement of specifications. It is not required that one user be entirely responsible for all outputs of this stage. One user could create the action item and the statement of action but leave the statement of specifications blank. Another user could continue the action and fill out the statement of specifications.
+The discovery stage is vitally important and serves as the foundation to the rest of the states. Improperly completed discovery may cause a failure in design and implementation. In this state users are encouraged to learn about the problem space. Do research and take notes on what a solution to the stated action would look like, try new tools, test small POCs. This state generates: notes, Statement of action, Statement of Inputs, and Statement of specifications. It is not required that one user be entirely responsible for all outputs of this stage. One user could create the action item and the statement of action but leave the statement of specifications blank. Another user could continue the action and fill out the statement of specifications.
 
 It is generally expected that the user finalizing the discovery state will be the user creating the design.
 
@@ -91,10 +91,14 @@ This is the end state of an action. Once an action has been completed and its ou
 
 The definition of "made available for use" varies per action and domain but is vitally important. An action cannot be considered complete if its outputs are not usable for other actions to consume as inputs.
 
+Some actions are "continuous" and are never ment to be completed. Generally they align with behaviors or functons that need to be manually repeated at the owners discrestion.
+
 # action metadata
 Action markdown files start with a frontmatter header that track the following information.
 - the owners of an action (list of strings)
 - the current state of the action
 - priority yes/no
 - continuous yes/no
+
+
 
