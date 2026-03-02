@@ -6,6 +6,11 @@
 - Frontmatter headers instead of tags?
 - Assignment info?
 
+# Statement of Inputs
+- [Create action-lite protocol](Create%20action-lite%20protocol.md)
+- [Create action agent orchestrator workflow](Create%20action%20agent%20orchestrator%20workflow.md)
+- [Create philosophy document and development tool context](Create%20philosophy%20document%20and%20development%20tool%20context.md)
+
 # Statement of Specifications
 - Built in rust
 - contains a nix flake for development and packaging
@@ -20,4 +25,6 @@
         - change the status of an action
         - move actions and **update all input references to them**
         - graph the actions in terminal as a flow chart for a single level. Allow user to enter a actions metagraphs if present. Should take over entire terminal screen.for a sing
+
+
 
