@@ -1,6 +1,6 @@
 ---
 name: action-lite
-description: "Use when creating, editing, or working with action files in the actions/ directory, or when managing action task tracking. Examples: create a new action, update action state, add action specifications."
+description: "Use when creating, editing, or working with action files in the actions/ directory, or when managing action task tracking. Examples: create a new action, update action state, add action specifications, make a graph of action tree"
 ---
 
 # Action-Lite Framework Skill
