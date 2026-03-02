@@ -13,7 +13,7 @@ Create an action-lite system which is compatible with the limitations of the fil
 
 # Statement of design
 
- Action lite is an agile file based task tracking system that uses acyclic directed metagraphs to track task requirements, state, strategy, and dependency. The goal of action is to directly link task management to architecture design. Action items are documents which declare the expected outcome of a system and how to get there in plain English.
+ Action lite is an agile file based task tracking system that uses acyclic directed metagraphs to track task requirements, state, strategy, and dependency. The goal of action is to directly link task management to architecture design. Action items are documents which declare the expected outcome of a system and how to get there in plain English, in terms of direct actionable tasks. By declaring this information Architecture requirements and designs are immediatly avaiable as tasks which can be assigned. No need to translate large architecture documents into individual PBIs, duplucating information.
 
 Action lite uses a directory "actions" to store all of its tasks which will be referred to as "actions". Each action is stored in a markdown file and has a frontmatter header for storing metadata. Action items create a dependency graph by declaring what actions they rely on explicitly as inputs, and directly state their expected outcome will be.
 
