@@ -13,7 +13,7 @@ Create an action-lite system which is compatible with the limitations of the fil
 
 # Statement of design
 
- Action lite is an agile file based task tracking system that uses acyclic directed metagraphs to track task requirements, state, strategy, and dependency. The goal of action is to directly link task management to architecture design. Action items are documents which declare the expected outcome of a system and how to get there in plain English, in terms of direct actionable tasks. By declaring this information Architecture requirements and designs are immediatly avaiable as tasks which can be assigned. No need to translate large architecture documents into individual PBIs, duplucating information. It should be possible to take action tree, start the project from scratch (clean room), and arrive at a similar implementation.
+ Action lite is an agile file based task tracking system that uses acyclic directed metagraphs to track task requirements, state, strategy, and dependency. The goal of action is to directly link task management to architecture design. Action items are documents which declare the expected outcome of a system and how to get there in plain English, in terms of direct actionable tasks. By declaring this information, architecture requirements and designs are immediately available as tasks which can be assigned. No need to translate large architecture documents into individual PBIs, duplicating information. It should be possible to take an action tree, start the project from scratch (clean room), and arrive at a similar implementation.
 
 Action lite uses a directory "actions" to store all of its tasks which will be referred to as "actions". Each action is stored in a markdown file and has a frontmatter header for storing metadata. Action items create a dependency graph by declaring what actions they rely on explicitly as inputs, and directly state their expected outcome will be.
 
@@ -47,7 +47,7 @@ Action documents have an associated state which tracks what phase of the action 
 6. published - Available for use. (stable state)
 
 # States
-Actions states are designed to bake in convergent and divergent thinking at different stages. This Ensures that individuals completing actions are given time to research and discover possible solutions before design & implementation. Think of the action workflow as a mix between the waterfall process and scrum. Each metagraph is its own backlog, and each action item is its own mini waterfall.
+Action states are designed to bake in convergent and divergent thinking at different stages. This ensures that individuals completing actions are given time to research and discover possible solutions before design & implementation. Think of the action workflow as a mix between the waterfall process and scrum. Each metagraph is its own backlog, and each action item is its own mini waterfall.
 
 ## Discovery - Divergent thinking
 The discovery stage is vitally important and serves as the foundation to the rest of the states. Improperly completed discovery may cause a failure in design and implementation. In this state users are encouraged to learn about the problem space. Do research and take notes on what a solution to the stated action would look like, try new tools, test small POCs. This state generates: notes, Statement of action, Statement of Inputs, and Statement of specifications. It is not required that one user be entirely responsible for all outputs of this stage. One user could create the action item and the statement of action but leave the statement of specifications blank. Another user could continue the action and fill out the statement of specifications.
@@ -55,9 +55,9 @@ The discovery stage is vitally important and serves as the foundation to the res
 It is generally expected that the user finalizing the discovery state will be the user creating the design.
 
 ## Design - Convergent thinking
-The design state is the next most important stage of action. Here the user plans out how the action will be performed. Generally an action design only cares about details 1-2 levels conceptually below itself. This prevents overburdening the user with excessive planning. For example, suppose  we have an action to "create a 'car' class". This design for this action might plan out the member types and function signatures for the class, and produce a UML diagram but will not plan the implementation of these functions.
+The design state is the next most important stage of action. Here the user plans out how the action will be performed. Generally an action design only cares about details 1-2 levels conceptually below itself. This prevents overburdening the user with excessive planning. For example, suppose we have an action to "create a 'car' class". This design for this action might plan out the member types and function signatures for the class, and produce a UML diagram but will not plan the implementation of these functions.
 
-Depending on the size of the action, it may be necessary to split up the design into smaller pieces. This is where the metagraph aspect of action comes into play. Every action item can contain a metagraph. This metagraph is represented by a directory of the same name as the action item. It can contain any number of sub action items. Steps detailed in the design state can be broken up into sub actions. Each sub-action may have its own metagraph. It is best if actions start at a high-level then get broken down into smaller pieces.
+Depending on the size of the action, it may be necessary to split up the design into smaller pieces. This is where the metagraph aspect of action comes into play. Every action item can contain a metagraph. This metagraph is represented by a directory of the same name as the action item. It can contain any number of sub-action items. Steps detailed in the design state can be broken up into sub-actions. Each sub-action may have its own metagraph. It is best if actions start at a high level then get broken down into smaller pieces.
 
 Generally actions should:
 - State the behavior and functions that are required to complete the action correctly.
@@ -81,7 +81,7 @@ Think of it as a discovery state against the output itself.
 
 If this state fails then the user can return to any of the previous states and re-start the cycle.
 
-This state does not produce any documents other then possible learnings which can be added to the "notes" section
+This state does not produce any documents other than possible learnings which can be added to the "notes" section
 
 ## Document - Convergent
 Although action handles architecture documentation, it does not handle other forms. Like user or developer documentation. This stage is designed to give the user space to document how to use their output. However architecture documentation should not be duplicated outside of action.
@@ -91,7 +91,7 @@ This is the end state of an action. Once an action has been completed and its ou
 
 The definition of "made available for use" varies per action and domain but is vitally important. An action cannot be considered complete if its outputs are not usable for other actions to consume as inputs.
 
-Some actions are "continuous" and are never ment to be completed. Generally they align with behaviors or functons that need to be manually repeated at the owners discrestion.
+Some actions are "continuous" and are never meant to be completed. Generally they align with behaviors or functions that need to be manually repeated at the owner's discretion.
 
 # action metadata
 Action markdown files start with a frontmatter header that track the following information.
