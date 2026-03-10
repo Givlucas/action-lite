@@ -6,10 +6,11 @@ continuous: false
 ---
 
 # Notes
-- LLMs can only think while writing. So they should have some space to create markdown documents t o reason with while working through action. Some clients have this built in to their thinking models. But it might be best to make it explicit.
+- LLMs can only think while writing. So they should have some space to create markdown documents to reason with while working through action. Some clients have this built in to their thinking models. But it might be best to make it explicit.
 - the recursive nature of action might ballon the context for agents depending on the scope of the problem.
 - Bot-thoughts-<stage>.md and memory.md documents to pass between stages as scratch pads?
 - Probably will want to pass through the original prompt as well, or atleast track it in a file
+- Seperate agent per stage? or break down even farther
 
 # Statement of Action
 
