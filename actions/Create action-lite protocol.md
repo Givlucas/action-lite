@@ -1,6 +1,6 @@
 ---
 owners: ["Lucas Givens"]
-state: document
+state: published
 priority: true
 continuous: false
 ---
