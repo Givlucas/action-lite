@@ -7,6 +7,7 @@ continuous: false
 
 # Notes
 - LLMs can only think while writing. So they should have some space to create markdown documents t o reason with while working through action. Some clients have this built in to their thinking models. But it might be best to make it explicit.
+- the recursive nature of action might ballon the context for agents depending on the scope of the problem.
 
 ## Action orchestratoion flow from human perspective.
 
@@ -14,6 +15,8 @@ continuous: false
 1. Check state of all actions not in published state
 2. Check for "priority" actions
 3. Determine which actions can be worked on next.
+
+for each ready action check the current state and determine which of the following to continue from.
 
 #### Discovery
 1. Initial problem  scoping - what is the action we want to preform (Create if not already defined, or understand current action).
@@ -24,16 +27,21 @@ continuous: false
 #### Design
 1. Based on research document, plan implementation of action 1-2 levels conceptually down. 1st draft
 2. Review design and re-shape if need be. 2nd draft
-3. If at high-level state still, create a meta graph directory and break down into sub actions till they finish "design" do not implement. If at sufficeint implementation level already, then move to next step without meta graph
-
--- Organize sub actions and then return --
 
 #### Implementation
-1. If sub actions where created in prvious step and are ready for implementation. Implement them.
-2. If sub action fails, re-evaulate sub action. If sub action failure was caused by overal design issue, revert super action to design or discover based on user discretion
+1. If at high-level state still, create a meta graph directory and break down into sub actions. To complete this action, continue to follow the action workflow against the sub actions until they reach the "published" state.
+2. If design is alread broken down enough continue straight to implementation in code.
 
+#### Test
+1. Verify against specifications, and statement of action. Does it meet the original goals? If not, revert to discovery, design, add additional specifications as needed, leave notes on important discoveries in note section.
+2. ensure code has good test coverage.
+3. Manually test feature. Does it look how you expected it to?
 
+#### Document
+1. Write user or developer documentation for the tool. Do not restate action or architecture. Architecture documentation lives in action only
 
+#### Publish
+1. Make avaiable for use, create and close a PR, publish to whatever location allows the end rusult to be used.
 
 # Statement of Action
 
