@@ -1,5 +1,5 @@
 #action #priority
-#document
+#design
 
 # Notes
 - Instead of tags for metadata frontmatter header
@@ -55,9 +55,7 @@ The discovery stage is vitally important and serves as the foundation to the res
 It is generally expected that the user finalizing the discovery state will be the user creating the design.
 
 ## Design - Convergent thinking
-The design state is the next most important stage of action. Here the user plans out how the action will be performed. Generally an action design only cares about details 1-2 levels conceptually below itself. This prevents overburdening the user with excessive planning. For example, suppose we have an action to "create a 'car' class". This design for this action might plan out the member types and function signatures for the class, and produce a UML diagram but will not plan the implementation of these functions.
-
-Depending on the size of the action, it may be necessary to split up the design into smaller pieces. This is where the metagraph aspect of action comes into play. Every action item can contain a metagraph. This metagraph is represented by a directory of the same name as the action item. It can contain any number of sub-action items. Steps detailed in the design state can be broken up into sub-actions. Each sub-action may have its own metagraph. It is best if actions start at a high level then get broken down into smaller pieces.
+The design state is the next most important stage of action. Here the user plans out how the action will be performed. Generally an action design only cares about details 1-2 levels conceptually below itself. This prevents overburdening the user with excessive planning. For example, suppose we have an action to "create a 'car' class". This design for this action might plan out the member types and function signatures for the class, and produce a UML diagram but will not plan the implementation of these functions. Sub actions and meta graph should not be created in this step. Design can be broken down into metagraphs if still too high level in the next step. 
 
 Generally actions should:
 - State the behavior and functions that are required to complete the action correctly.
@@ -68,7 +66,9 @@ Generally actions should:
 The format of a design is the user's choice. It could be UML documents, graphs, charts, etc. However, it is recommended that plain language should accompany and explain any extra artifacts. 
 
 ## Implementation - Convergent thinking
-This stage handles actually performing the design laid out by the action. The user completing this state does not need to be the user who did the design or discovery state. Here the user will read the design and complete it per specification to the best of their ability. If issues arise it is expected that the user will contact  the author of the action and return to the design or even discover state if necessary. This iterative nature allows for changes based on empirical observation and is encouraged to ensure that the action is properly completed.
+In this stage two things can happen. One, The user determines that the task is too generic, and must be broken down. From here the use can create a metagraph to decompose the action into sub actions. This can happen as man times as needed until sufficent detail is planned. The ammount of detail required is up to the team to determine. Two, the user determines that the action has enough detail and implementation can begin.
+
+The user completing this state does not need to be the user who did the design or discovery state. Here the user will read the design and complete it per specification to the best of their ability. If issues arise it is expected that the user will contact  the author of the action and return to the design or even discover state if necessary. This iterative nature allows for changes based on empirical observation and is encouraged to ensure that the action is properly completed.
 
 Actions cannot move into this state unless all input actions have been completed and the Design + Discovery state has been completed.
 
