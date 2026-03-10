@@ -28,7 +28,7 @@ Actions items can have their own metagraphs, which track the tasks needed to bre
 Actions should be directly actionable like "develop a user page" or "Remediate Bug in A". Actions should not be vague. "Bug in A" or "User page" are not proper names for actions.  If an action would be something that takes place in action workflow it doesn't need its own action. For example "Design User page" or "Gather User page requirements" do not need their own actions because they already take place in the action system.
 
 Action documents have the following sections
-1. Notes - general notes / research on the task
+1. Notes - research on the task, task specific, things that anyone interacting with the document should know, specific tasks learnings or how it failed in previous attempts. Notes and learnings about tools, concepts the user needed to brush on should be kept out of action
 2. Statement of Action - The task to be performed, more in-depth than the title, may include why the action is needed. Gives background and context to the action.
 3. Statement of Specifications - List of requirements the action must meet to be considered completed.
 4. Statement of Inputs - a markdown bullet list of .md links to other actions noting dependency relationship
@@ -49,7 +49,7 @@ Action documents have an associated state which tracks what phase of the action 
 	- outputs: Title, Notes, Statement of action, statement of inputs, statement of specifications
 2. design 
 	- outputs: Statement of design
-3. implementation - Follow design
+3. implementation - Follow design, or build out metagraph
 4. test - evaluate that system meets specs. go back to design if test fails.
 5. document - produce any needed user documentation for the system ensure code is properly commented. Does not need to be stored in action.
 6. published - Available for use. (stable state)
@@ -57,10 +57,14 @@ Action documents have an associated state which tracks what phase of the action 
 # States
 Action states are designed to bake in convergent and divergent thinking at different stages. This ensures that individuals completing actions are given time to research and discover possible solutions before design & implementation. Think of the action workflow as a mix between the waterfall process and scrum. Each metagraph is its own backlog, and each action item is its own mini waterfall.
 
+If at any state or point in development and issue arises users are encouraged to return to any previous stage. However, users may not skip foward
+
 ## Discovery - Divergent thinking
 The discovery stage is vitally important and serves as the foundation to the rest of the states. Improperly completed discovery may cause a failure in design and implementation. In this state users are encouraged to learn about the problem space. Do research and take notes on what a solution to the stated action would look like, try new tools, test small POCs. This state generates: notes, Statement of action, Statement of Inputs, and Statement of specifications. It is not required that one user be entirely responsible for all outputs of this stage. One user could create the action item and the statement of action but leave the statement of specifications blank. Another user could continue the action and fill out the statement of specifications.
 
 It is generally expected that the user finalizing the discovery state will be the user creating the design.
+
+Actions can move into this state at any point, even if there has been little planning done. This is the initial state of all actions
 
 ## Design - Convergent thinking
 The design state is the next most important stage of action. Here the user plans out how the action will be performed. Generally an action design only cares about details 1-2 levels conceptually below itself. This prevents overburdening the user with excessive planning. For example, suppose we have an action to "create a 'car' class". This design for this action might plan out the member types and function signatures for the class, and produce a UML diagram but will not plan the implementation of these functions. Sub actions and meta graph should not be created in this step. Design can be broken down into metagraphs if still too high level in the next step. 
@@ -73,6 +77,8 @@ Generally actions should:
 
 The format of a design is the user's choice. It could be UML documents, graphs, charts, etc. However, it is recommended that plain language should accompany and explain any extra artifacts.
 
+Actions should only move into this state once all of its inputs are in the "published" state
+
 It is the user/teams choice on what a "completed" design is
 
 ## Implementation - Convergent thinking
@@ -80,12 +86,17 @@ In this stage two things can happen. One, The user determines that the task is t
 
 The user completing this state does not need to be the user who did the design or discovery state. Here the user will read the design and complete it per specification to the best of their ability. If issues arise it is expected that the user will contact  the author of the action and return to the design or even discover state if necessary. This iterative nature allows for changes based on empirical observation and is encouraged to ensure that the action is properly completed.
 
-Actions cannot move into this state unless all input actions have been completed and the Design + Discovery state has been completed.
+Actions cannot move into this state unless the Design + Discovery state has been completed.
+
+Actions cannot move from this state until all sub actions are completed
 
 ## Test - Divergent thinking
+Actions cannot move into this state unless implementation has been completed
+
 The test state involves:
 - Stress testing the output
-- Evaluating that the output meets specifications outlined in earlier sections
+- Evaluating that the output meets specifications and action statement outlined in earlier sections
+- Verifying that solution has proper unit test coverage
 
 Think of it as a discovery state against the output itself.
 
@@ -111,6 +122,8 @@ Action markdown files start with a frontmatter header that track the following i
 - continuous yes/no
 
 # Example action workflow
+
+Note at any point tin the workflow the user can return to a previous  stage
 
 #### Start
 1. Check state of all actions not in published state
