@@ -59,7 +59,10 @@ Actions progress through these states:
 
 ### State Transition Rules
 - Actions start in `discovery`
-- Cannot enter `implementation` until all input actions are `published` AND discovery + design are complete
+- Should only enter `design` state once all input actions are `published`
+- Cannot enter `implementation` until discovery + design are complete
+- Can return to any previous state at any point if issues arise
+- Cannot skip states forward (must progress sequentially)
 - Failed `test` can return to any previous state
 - `continuous` actions may never reach `published`
 
