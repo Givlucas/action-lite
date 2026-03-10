@@ -65,7 +65,9 @@ Generally actions should:
 - Are fairly verbose
 - Should not contain any code beyond perhaps interfaces or basic type signatures, or generic pseudo code for particularly complex algorithms. Outside of this no code should be written in this stage.
 
-The format of a design is the user's choice. It could be UML documents, graphs, charts, etc. However, it is recommended that plain language should accompany and explain any extra artifacts. 
+The format of a design is the user's choice. It could be UML documents, graphs, charts, etc. However, it is recommended that plain language should accompany and explain any extra artifacts.
+
+It is the user/teams choice on what a "completed" design is
 
 ## Implementation - Convergent thinking
 In this stage two things can happen. One, The user determines that the task is too generic, and must be broken down. From here the use can create a metagraph to decompose the action into sub actions. This can happen as man times as needed until sufficent detail is planned. The ammount of detail required is up to the team to determine. Two, the user determines that the action has enough detail and implementation can begin.
@@ -102,5 +104,36 @@ Action markdown files start with a frontmatter header that track the following i
 - priority yes/no
 - continuous yes/no
 
+# Example action workflow
 
+#### Start
+1. Check state of all actions not in published state
+2. Check for "priority" actions
+3. Determine which actions can be worked on next.
 
+for each ready action check the current state and determine which of the following to continue from.
+
+#### Discovery
+1. Initial problem  scoping - what is the action we want to preform (Create if not already defined, or understand current action).
+2. Initial specs - What we already know we want as a requirements for the out come of the action. Does this action have any inputs?
+3. Research problem space - Other solutions tools libraries algorithms internal and external project research
+4. Add additional specifications based on research. Re-scope action if necessary.
+
+#### Design
+1. Based on research document, plan implementation of action 1-2 levels conceptually down. 1st draft
+2. Review design and re-shape if need be. 2nd draft
+
+#### Implementation
+1. If at high-level state still, create a meta graph directory and break down into sub actions. To complete this action, continue to follow the action workflow against the sub actions until they reach the "published" state.
+2. If design is alread broken down enough continue straight to implementation in code.
+
+#### Test
+1. Verify against specifications, and statement of action. Does it meet the original goals? If not, revert to discovery, design, add additional specifications as needed, leave notes on important discoveries in note section.
+2. ensure code has good test coverage.
+3. Manually test feature. Does it look how you expected it to?
+
+#### Document
+1. Write user or developer documentation for the tool. Do not restate action or architecture. Architecture documentation lives in action only
+
+#### Publish
+1. Make avaiable for use, create and close a PR, publish to whatever location allows the end rusult to be used.
