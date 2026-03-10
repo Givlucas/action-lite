@@ -7,6 +7,7 @@ continuous: false
 
 # Notes
 - Instead of tags for metadata frontmatter header
+- action = f(x) = Discovery -> Design | revert -> implementation | f(x)^n | revert -> test | revert -> Document | revert -> publish, where revert is = to returning to any previous step
 
 # Statement of Action
 Create an action-lite system which is compatible with the limitations of the file system format.
