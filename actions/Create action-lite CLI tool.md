@@ -16,7 +16,7 @@ Create a command-line interface tool for managing the action-lite task tracking 
 # Statement of Inputs
 - [Create action-lite protocol](Create%20action-lite%20protocol.md)
 - [Create action agent orchestrator workflow](Create%20action%20agent%20orchestrator%20workflow.md)
-- [Create philosophy document and development tool context](Create%20philosophy%20document%20and%20development%20tool%20context.md)
+- [Create development philosophy claude file skill and development tool context](Create%20development%20philosophy%20claude%20file%20skill%20and%20development%20tool%20context.md)
 
 # Statement of Specifications
 - Built in Rust

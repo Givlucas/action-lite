@@ -1,17 +1,22 @@
-#action #priority
-#design
+---
+owners: []
+state: design
+priority: true
+continuous: false
+---
 
 # Notes
 - Instead of tags for metadata frontmatter header
 
-# Statement of action
+# Statement of Action
 Create an action-lite system which is compatible with the limitations of the file system format.
-# Statement of inputs
 
-# Statement of specifications
+# Statement of Inputs
+
+# Statement of Specifications
 - Must be file based.
 
-# Statement of design
+# Statement of Design
 
  Action lite is an agile file based task tracking system that uses acyclic directed metagraphs to track task requirements, state, strategy, and dependency. The goal of action is to directly link task management to architecture design. Action items are documents which declare the expected outcome of a system and how to get there in plain English, in terms of direct actionable tasks. By declaring this information, architecture requirements and designs are immediately available as tasks which can be assigned. No need to translate large architecture documents into individual PBIs, duplicating information. It should be possible to take an action tree, start the project from scratch (clean room), and arrive at a similar implementation.
 
