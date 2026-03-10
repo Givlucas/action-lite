@@ -7,7 +7,6 @@ continuous: false
 
 # Notes
 - Instead of tags for metadata frontmatter header
-- action = f(x) = Discovery -> Design | revert -> implementation | f(x)^n | revert -> test | revert -> Document | revert -> publish, where revert is = to returning to any previous step
 
 # Statement of Action
 Create an action-lite system which is compatible with the limitations of the file system format.
@@ -60,9 +59,11 @@ Action states are designed to bake in convergent and divergent thinking at diffe
 If at any state or point in development and issue arises users are encouraged to return to any previous stage. However, users may not skip foward
 
 ## Discovery - Divergent thinking
-The discovery stage is vitally important and serves as the foundation to the rest of the states. Improperly completed discovery may cause a failure in design and implementation. In this state users are encouraged to learn about the problem space. Do research and take notes on what a solution to the stated action would look like, try new tools, test small POCs. This state generates: notes, Statement of action, Statement of Inputs, and Statement of specifications. It is not required that one user be entirely responsible for all outputs of this stage. One user could create the action item and the statement of action but leave the statement of specifications blank. Another user could continue the action and fill out the statement of specifications.
+The discovery stage is vitally important and serves as the foundation to the rest of the states. Improperly completed discovery may cause a failure in design and implementation. In this state users are encouraged to learn about the problem space. Do external and internal projec research and take notes on what a solution to the stated action would look like, try new tools, test small POCs.
 
-It is generally expected that the user finalizing the discovery state will be the user creating the design.
+This state generates: notes, Statement of action, Statement of Inputs, and Statement of specifications. It is not required that one user be entirely responsible for all outputs of this stage. One user could create the action item and the statement of action but leave the statement of specifications blank. Another user could continue the action and fill out the statement of specifications.
+
+It is generally expected that the user finalizing the discovery state will be the user creating the design and the user who preformed the most relevent research.
 
 Actions can move into this state at any point, even if there has been little planning done. This is the initial state of all actions
 
@@ -124,7 +125,11 @@ Action markdown files start with a frontmatter header that track the following i
 # Example action workflow
 
 Note at any point in the workflow the user can return to a previous stage
+```
+action = f(x) = Discovery -> Design | revert -> implementation | f(x)^n | revert -> test | revert -> Document | revert -> publish
 
+where "revert" is = to returning to any previous step
+```
 #### Start
 1. Check state of all actions not in published state
 2. Check for "priority" actions
