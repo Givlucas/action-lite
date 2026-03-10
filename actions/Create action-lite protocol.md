@@ -123,7 +123,7 @@ Action markdown files start with a frontmatter header that track the following i
 
 # Example action workflow
 
-Note at any point tin the workflow the user can return to a previous  stage
+Note at any point in the workflow the user can return to a previous stage
 
 #### Start
 1. Check state of all actions not in published state
@@ -134,8 +134,8 @@ for each ready action check the current state and determine which of the followi
 
 #### Discovery
 1. Initial problem  scoping - what is the action we want to preform (Create if not already defined, or understand current action).
-2. Initial specs - What we already know we want as a requirements for the out come of the action. Does this action have any inputs?
-3. Research problem space - Other solutions tools libraries algorithms internal and external project research
+2. Initial specs - What we already know we want as a requirements for the out come of the action. Does this action require any inputs?
+3. Research problem space - Other solutions, tools, libraries, algorithms, general internal and external project research
 4. Add additional specifications based on research. Re-scope action if necessary.
 
 #### Design
