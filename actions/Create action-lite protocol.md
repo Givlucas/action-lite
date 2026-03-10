@@ -30,11 +30,13 @@ Action documents have the following sections
 
 sections are denoted by a markdown "#", with a space and the name of the section following.
 
+``` markdown
 # Notes
 # Statement of action
 # Statement of inputs
 # Statement of Specifications
 # Statement of Design
+```
 
 Action documents have an associated state which tracks what phase of the action workflow they are in. Below are the possible states for an action.
 1. discovery - all actions start here
