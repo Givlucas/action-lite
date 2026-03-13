@@ -27,7 +27,7 @@ Actions items can have their own metagraphs, which track the tasks needed to bre
 Actions should be directly actionable like "develop a user page" or "Remediate Bug in A". Actions should not be vague. "Bug in A" or "User page" are not proper names for actions.  If an action would be something that takes place in action workflow it doesn't need its own action. For example "Design User page" or "Gather User page requirements" do not need their own actions because they already take place in the action system.
 
 Action documents have the following sections
-1. Notes - research on the task, task specific, things that anyone interacting with the document should know, specific tasks learnings or how it failed in previous attempts. Notes and learnings about tools, concepts the user needed to brush on should be kept out of action
+1. Notes - research on the task, task specific, things that anyone interacting with the document should know, specific tasks learnings or how it failed in previous attempts. Notes and learnings about tools, personal scratch pad, intersting links and refrences
 2. Statement of Action - The task to be performed, more in-depth than the title, may include why the action is needed. Gives background and context to the action.
 3. Statement of Specifications - List of requirements the action must meet to be considered completed.
 4. Statement of Inputs - a markdown bullet list of .md links to other actions noting dependency relationship
