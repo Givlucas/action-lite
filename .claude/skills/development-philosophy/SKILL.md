@@ -1,6 +1,6 @@
 ---
 name: software-development-philosophy
-description: "Use when doing anything involving software"
+description: "Use when doing anything involving software, programming, coding, configuration. Examples, Create a <program>, Design a <program>, Write me a <progam>"
 ---
 
 
