@@ -7,7 +7,7 @@ An agile, file-based task tracking system that uses acyclic directed metagraphs 
 
 ## Overview
 
-action-lite directly links task management to architecture design. Actions are markdown documents that declare expected outcomes and how to achieve them in plain English. By storing architecture requirements as actionable tasks, there's no need to translate large architecture documents into individual work items.
+action-lite directly links architecture design to task management. Actions are markdown documents that declare expected outcomes and how to achieve them in plain English. By storing architecture requirements as actionable tasks, there's no need to translate large architecture documents into individual work items. While action focuses on architecture it works for everyday adhoc tasks as well.
 
 ## Key Concepts
 
