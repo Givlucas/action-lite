@@ -126,7 +126,7 @@ Action markdown files start with a frontmatter header that track the following i
 
 Note at any point in the workflow the user can return to a previous stage
 ```
-action = f(x) = Discovery -> Design | revert -> implementation | f(x)^n | revert -> test | revert -> Document | revert -> publish
+action = f(x) = Discovery -> Design | revert -> implementation | f(x) * n | revert -> test | revert -> Document | revert -> publish
 
 where "revert" is = to returning to any previous step
 ```
