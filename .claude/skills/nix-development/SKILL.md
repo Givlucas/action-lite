@@ -1,6 +1,6 @@
 ---
-name: software-development-philosophy
-description: "Use when doing anything involving software, programming, coding, configuration. Examples, Create a <program>, Design a <program>, Write me a <progam>"
+name: nix-development-philosophy
+description: "Use when doing anything involving software, programming, coding, configuration. Examples, Create a <program>, Design a <program>, Write me a <progam>, anything involving nix"
 ---
 
 Always use nix when creating software. Even scripts should have their own repo with their own flake.
