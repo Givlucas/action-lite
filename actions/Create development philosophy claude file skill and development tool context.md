@@ -22,7 +22,7 @@ Create a re-usable skill of your personal philosphy and re-usable skills for dev
 Create several skills
 - [ ] development-philosphy skill - Built from personal notes - work and home notes. Contains influences on stratagies, philosophy, typing, and patterns
   - [x] Personal
-  - [ ] Work
+  - [x] Work
 - [ ] rust development skill - Specific rust best practice guidelines
 - [ ] nix development skil - Specific nix best practice guidelines.
 
