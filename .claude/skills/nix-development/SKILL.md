@@ -1,6 +1,6 @@
 ---
 name: nix-development-philosophy
-description: "Use when doing anything involving software, programming, coding, configuration. Examples, Create a <Flake/program>, Design a <program/flake>, Write me a <progam/flake>, anything involving nix"
+description: "REQUIRED before creating ANY Nix flakes, derivations, or NixOS configurations. MUST invoke FIRST for all Nix-related work. Contains mandatory Nix standards including pinning, purity, and flake structure requirements. Do NOT proceed without reading."
 ---
 
 Always use nix when creating software. Even scripts should have their own repo with their own flake.

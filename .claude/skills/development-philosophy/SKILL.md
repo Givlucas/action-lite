@@ -1,6 +1,6 @@
 ---
 name: software-development-philosophy
-description: "Use when doing anything involving software, programming, coding, configuration. Examples, Create a <program>, Design a <program>, Write me a <progam>"
+description: "REQUIRED before writing ANY code (even nix). MUST invoke FIRST when creating, designing, or modifying software. Contains mandatory engineering principles, TDD requirements, and quality standards. Do NOT skip this step."
 ---
 
 ## Test Driven Development
