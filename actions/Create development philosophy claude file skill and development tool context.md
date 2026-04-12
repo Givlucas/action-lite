@@ -23,7 +23,8 @@ Create several skills
 - [ ] development-philosphy skill - Built from personal notes - work and home notes. Contains influences on stratagies, philosophy, typing, and patterns
   - [x] Personal
   - [x] Work
-- [ ] rust development skill - Specific rust best practice guidelines
+- [x] rust development skill - Specific rust best practice guidelines
+  - so far, rust is so well gaurdrailed there isn't really anything I think I need to specifiy thats not idomatic rust already...
 - [ ] nix development skil - Specific nix best practice guidelines.
 
 To create skills do research spikes into best pratice for both rust and nix.
