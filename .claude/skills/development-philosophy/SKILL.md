@@ -3,6 +3,8 @@ name: software-development-philosophy
 description: "Use when doing anything involving software, programming, coding, configuration. Examples, Create a <program>, Design a <program>, Write me a <progam>"
 ---
 
+## Test Driven Development
+Always write the functions signatures and types first, then write tests based on the behavior you want to see, then implement. Never implement without writing tests first. Only test what you need to don't go over bored just for testing sake, only test things you expect to happen EVERY time for a given input. Remember the pyramid of testing you should have: Lots of unit tests > some integration tests > even fewer end to end tests
 
 ## Software Development is Engineering
 Computer science is an engineering discipline. A solution must solve its goal to be considered correct, even if the edges are somewhat rough. The preferred solution is one that is maintainable (easy to fix, expand, or rework), feasible (achievable with available resources), and cost-productive (worth the effort to implement and maintain). Riskier problems require higher degrees of quality and certainty; fly-by-wire software demands more rigor than a simple CRUD app.
