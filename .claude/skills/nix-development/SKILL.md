@@ -14,3 +14,4 @@ Always use nix when creating software. Even scripts should have their own repo w
 - Never install programs using nix profile or nix-env install. Use of nix-shell -p for all one off use cases. Always prefer adding packages to flake / derivation
 - Always include a nix "check" option with flakes.
 - Never write software that will requires a FHS env
+- Always build for all systems using the flakeutils repo
