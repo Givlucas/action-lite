@@ -1,6 +1,6 @@
 ---
 owners: [Lucas Givens]
-state: test
+state: published
 priority: false
 continuous: false
 ---
