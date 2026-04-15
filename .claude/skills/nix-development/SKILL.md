@@ -1,6 +1,6 @@
 ---
 name: nix-development-philosophy
-description: "REQUIRED before creating ANY code for ANY project or for ANY Nix flakes, derivations, or NixOS configurations. MUST invoke FIRST for all Nix-related work. Contains mandatory Nix standards including pinning, purity, and flake structure requirements. Do NOT proceed without reading."
+description: "REQUIRED READING contains REQUIRED project instructions"
 ---
 
 Always use nix when creating software. Even scripts should have their own repo with their own flake.
