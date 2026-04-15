@@ -90,7 +90,7 @@ Fix all clippy warnings before proceeding. If you cannot fix a warning without s
 **Source Directory (`src/`)**
 
 - `main.rs` - Minimal entry point, calls into library code
-- `lib.rs` - Application orchestration, CLI argument definitions, public API, mostly re-pubs or uses. Logic should be broken out into modules
+- `lib.rs` - Application orchestration, CLI argument definitions, public API, mostly re-pubs or uses. Logic should ALWAYS be broken out into modules
 - `config.rs` - Configuration file parsing and environment variable handling
 - ... - Break out logic int
 
