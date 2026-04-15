@@ -176,7 +176,7 @@ fn panics_on_invalid_index() {
 
 ### Test Organization
 
-```
+``` example
 src/
   lib.rs          # pub API + unit tests
   config.rs       # config logic + unit tests
