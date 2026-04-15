@@ -11,9 +11,6 @@ continuous: false
 ## Nix
 - define general project structure guidlines
 - define unit testing strategy 
-## Rust
-- define general project structure guidlines
-- define unit testing strategy 
 
 # Statement of Action
 Create a re-usable skill of your personal philosphy and re-usable skills for development tools
@@ -27,10 +24,10 @@ Create a re-usable skill of your personal philosphy and re-usable skills for dev
 
 # Statement of Design
 Create several skills
-- [ ] development-philosphy skill - Built from personal notes - work and home notes. Contains influences on stratagies, philosophy, typing, and patterns
+- [x] development-philosphy skill - Built from personal notes - work and home notes. Contains influences on stratagies, philosophy, typing, and patterns
   - [x] Personal
   - [x] Work
-- [ ] rust development skill - Specific rust best practice guidelines
+- [x] rust development skill - Specific rust best practice guidelines
 - [ ] nix development skil - Specific nix best practice guidelines.
 
 To create skills do research spikes into best pratice for both rust and nix.
