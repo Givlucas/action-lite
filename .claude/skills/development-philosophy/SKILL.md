@@ -1,6 +1,6 @@
 ---
 name: software-development-philosophy
-description: "REQUIRED before writing ANY code (even nix). MUST invoke FIRST when creating, designing, or modifying software. Contains mandatory engineering principles, TDD requirements, and quality standards. Do NOT skip this step."
+description: "REQUIRED before writing ANY code of ANY language. MUST invoke FIRST when creating, designing, or modifying software. Contains mandatory engineering principles, TDD requirements, and quality standards. Do NOT skip this step."
 ---
 
 ## Test Driven Development
