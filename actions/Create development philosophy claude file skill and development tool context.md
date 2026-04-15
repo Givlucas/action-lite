@@ -1,16 +1,11 @@
 ---
 owners: [Lucas Givens]
-state: implimentation
+state: test
 priority: false
 continuous: false
 ---
 
 # Notes
-- Philosphy docuemnt still missing work notes
-
-## Nix
-- define general project structure guidlines
-- define unit testing strategy 
 
 # Statement of Action
 Create a re-usable skill of your personal philosphy and re-usable skills for development tools
@@ -28,6 +23,6 @@ Create several skills
   - [x] Personal
   - [x] Work
 - [x] rust development skill - Specific rust best practice guidelines
-- [ ] nix development skil - Specific nix best practice guidelines.
+- [x] nix development skil - Specific nix best practice guidelines.
 
 To create skills do research spikes into best pratice for both rust and nix.
