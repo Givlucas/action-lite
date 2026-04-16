@@ -1,6 +1,6 @@
 ---
 name: nix-development-philosophy
-description: "REQUIRED READING contains REQUIRED software development instructions"
+description: "REQUIRED before writing, planning, or working with any code while on a nix system or project. Contains crucial project standards and guidelines"
 ---
 
 Always use nix when creating software. Even scripts should have their own repo with their own flake.
