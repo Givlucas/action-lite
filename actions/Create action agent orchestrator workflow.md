@@ -27,4 +27,78 @@ Create a agent worflow that will follow the action lite process
 - [ ] Agents and skills must be packaged as a claude plugin
 
 # Statement of Design
+Each stage in the action lite workflow will get its own dedicated agent.
+- Discovery
+- Design
+- Implementation
+- Test
+- Documentation
+- Publish
+Each agent will have a narrowly defined goal in accordance with the action lite workflow. This goal should be 1 to 2 paragraphs at the most.
+
+A main "orchestration agent" will be difined that will control the process at a high level and will call sub-agents and prompt and create necessary files. The agent should be limited to only completeing a single action and its sub actions at a time.
+
+Agent artifacts will be used to pass information between stages. This will get its own directory in the project labeled "agent artifacts". These documents are for agent reasoning only. Each action item given to the LLM will have its own sub-directory in the artifcat directory. It will contain the documents produced and associated the action through out the entire workflow.
+
+Due to the nature of LLMs they can only "reason" while generating resources. All long context reasoning happens by looping over outputs and writing new information about those outputs. LLM reasoning can only happen in language.
+
+```
+agent-artifacts/
+  action-stack.md
+  action-item/
+    bot-thoughts-{stage}.md
+    original-prompt.md
+    memory.md
+```
+
+Each action artifact directory should contain the following items
+- bot-thoughts-{stage}.md
+- original-prompt.md
+- memory.md
+
+# bot thoughts
+Each per stage agent will be given a "bot-thoughts.md" document to reason in as a scratch pad. This should be used in conjuction with their built in reasoning systems. No information in this document should be thought of as concrete and more like surface level thoughts, bad and good ideas are welcome here. These documents are only share with the stage they belong to.
+
+# Original prompt
+Passing the original prompt through to each agent stage will help keep the process aligned through all stages. Additionally agents are of course given access to the action documents themselves which contain task requests and desing information. I've observed this pseudo attention mechanism provides higher quality reasoning outputs.
+
+# Memory.md
+Memory.md is a document which is passed between stages. It contains long term information the LLM believes maybe important for other agents to see, but does not belong in the action document itself. Think of it as the agents long term memory. It also takes advantage of the pseudo attention mechanism.
+
+# action stack.md
+is a first in last out stack of action. Each line represents a single action and should contain the file name of the action. The item on the top of the stack is the current active action. 
+
+# The worflow
+The main agent should be callable only by humans and will orchestrate the sub-agents as so.
+
+## Initalize the agent
+- provide the orchestration agent with context and activate the agent lite skill
+- Orchestration agent ensures action stack is empty. if not it is emptied and the current action is added as the first element
+- Orchestration Agent ensures "agent-artifacts.md" exists and that a action item sub directory is present for the action. Stores the orginal prompt and creates a memory document
+- Orchestration Agent reads the action item to check what stage it is in.
+- Orchestration Agent begins the workflow in the appropriate phase based on the current state of the document.
+
+## The workflow
+The orchestration agent should, based on the current state of the action, should call the most apporpiate sub agent.
+
+The orchestration agent will pass it the paths of the following files
+- bot-thoughts-{stage}.md (create if not present)
+- memory.md
+- original-prompt.md
+- the path to the current action document.
+
+Each stage agent should return a single sentance stating if it failed or completed success fully. If it failed the sub agent should return the name of the stage we should return to.
+
+After completion the orchestration agent will check for the following:
+- check the current state of the action document to determine what do next
+- If the action ends up having sub actions, the orchestator will wait for the implementation agent to create the first set of sub actions and their statements of actions, then will add them all to the action stack. Orchestration agent should then switch to orchestrating for the action on the top of the stack.
+- If the action is complete the agent will check the action stack document update it if needed, and move on to the next action in the stack. If empty it will return control back to the user.
+
+
+
+
+
+
+
+
 
