@@ -89,10 +89,13 @@ The orchestration agent will pass it the paths of the following files
 
 Each stage agent should return a single sentence stating if it failed or completed successfully. If it failed the sub agent should return the name of the stage we should return to.
 
-After completion the orchestration agent will check for the following:
-- check the current state of the action document to determine what do next
-- If the action ends up having sub-actions, the orchestrator will wait for the implementation agent to create the first set of sub-actions and their statements of actions, then will add them all to the action stack. Orchestration agent should then switch to orchestrating for the action on the top of the stack.
-- If the action is complete the agent will check the action stack document, update it if needed, and move on to the next action in the stack. If empty it will return control back to the user.
+After completion the orchestration agent will check the current state of the action document and the previous agents report statement to determine what do next.
+
+if the action item failed the orchestrator will clean up after it, then call then revert to the requested stage.
+
+If the action ends up having sub-actions, the orchestrator will wait for the implementation agent to create the first set of sub-actions and their statements of actions, then will add them all to the action stack. Orchestration agent should then switch to orchestrating for the action on the top of the stack.
+
+If the action is complete the agent will check the action stack document, update it if needed, and move on to the next action in the stack. If empty it will return control back to the user.
 
 
 
