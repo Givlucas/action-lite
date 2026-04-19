@@ -97,11 +97,33 @@ If the action ends up having sub-actions, the orchestrator will wait for the imp
 
 If the action is complete the agent will check the action stack document, update it if needed, and move on to the next action in the stack. If empty it will return control back to the user.
 
+```mermaid
+stateDiagram-v2
+    [*] --> Initialize: Human invokes orchestrator
+    Initialize --> ReadAction: Setup complete
 
+    ReadAction --> CallStageAgent: Determine current stage
 
+    CallStageAgent --> ReadAgentReport: Agent returns
 
+    ReadAgentReport --> EvaluateAction: Check action state
 
+    EvaluateAction --> Cleanup: Stage failed
+    EvaluateAction --> CheckSubActions: Stage succeeded
 
+    Cleanup --> CallStageAgent: Revert to requested stage
+
+    CheckSubActions --> PushToStack: Sub-actions created
+    CheckSubActions --> CheckActionComplete: No sub-actions
+
+    PushToStack --> ReadAction: Switch to top of stack
+
+    CheckActionComplete --> CallStageAgent: More stages remain
+    CheckActionComplete --> PopStack: Action complete
+
+    PopStack --> ReadAction: Stack has more actions
+    PopStack --> [*]: Stack empty, return to user
+```
 
 
 
