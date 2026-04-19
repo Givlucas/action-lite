@@ -13,6 +13,7 @@ continuous: false
 - Separate agent per stage? or break down even further
 
 - Might need to define more about how the agent will "determine next stage to run"
+- LLM had a little trouble generating the mermaid diagram the first time around. it made a single node for "run agent" I think it was more it's mistake then my own
 
 # Statement of Action
 Create an agent workflow that will follow the action lite process
