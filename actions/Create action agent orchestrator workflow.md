@@ -12,6 +12,8 @@ continuous: false
 - Probably will want to pass through the original prompt as well, or atleast track it in a file
 - Separate agent per stage? or break down even further
 
+- Might need to define more about how the agent will "determine next stage to run"
+
 # Statement of Action
 Create an agent workflow that will follow the action lite process
 
