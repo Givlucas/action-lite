@@ -130,6 +130,3 @@ stateDiagram-v2
 ```
 
 
-# Packaging & layout 
-... <TBC> ...
-
