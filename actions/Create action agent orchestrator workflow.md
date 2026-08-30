@@ -6,7 +6,6 @@ continuous: false
 ---
 
 # Notes
-- need to rename output is a design which is apart of action flow. "create orchestrator agent" is better. with workflow documentation as an output.
 - LLMs can only think while writing. So they should have some space to create markdown documents to reason with while working through action. Some clients have this built in to their thinking models. But it might be best to make it explicit.
 - the recursive nature of action might balloon the context for agents depending on the scope of the problem. Best to make a flat system
 - Bot-thoughts-<stage>.md and memory-action.md documents to pass between stages and actions as scratch pads?
