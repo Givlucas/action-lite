@@ -37,6 +37,7 @@ Each stage in the action lite workflow will get its own dedicated agent.
 - Test
 - Documentation
 - Publish
+
 Each agent will have a narrowly defined goal in accordance with the action lite workflow. This goal should be 1 to 2 paragraphs at the most.
 
 A main "orchestration agent" will be defined that will control the process at a high level and will call sub-agents and prompt and create necessary files. The agent should be limited to only completing a single action and its sub-actions at a time.
