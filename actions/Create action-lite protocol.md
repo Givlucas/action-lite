@@ -1,12 +1,13 @@
 ---
 owners: ["Lucas Givens"]
-state: published
+state: discovery 
 priority: false
 continuous: false
 ---
 
 # Notes
 - Instead of tags for metadata frontmatter header
+need to reframe, this is not actionable, no implementation stage possible unless using another action
 
 # Statement of Action
 Create an action-lite system which is compatible with the limitations of the file system format.
